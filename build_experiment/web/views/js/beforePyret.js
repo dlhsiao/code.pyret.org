@@ -1206,76 +1206,103 @@
 	    if (hasOpenedFile){
 	    	create = false;
 	    }
-	    	//Test commnent
-
-			if (create){
-				console.log("File has not been opened");
-				// programToSave.then(function(p){
-        //
-				// })
-				// Q.nfcall(api.createFile, contents).then(function(f){
-				// 	programToSave = f;
-				// 	console.log("in big promise thing");
-				// });
-				api.createFile(contents).then(function(f){
-					programToSave = f;
-					hasOpenedFile = true;
-					console.log("inside promise");
-					console.log("hasOpenedFile inside: ", hasOpenedFile);
-					console.log("programToSave: " , programToSave);
-				});
-
-				console.log("after create file");
-
-			} else {
-				console.log("File has been opened");
-				// programToSave.then(function(p){
-				// 	api.autoSave(p)
-				// });
-				console.log(programToSave);
-				api.autoSave(programToSave, contents);
-			}
 
 
+			// if (create){
+			// 	console.log("File has not been opened");
+			// 	// programToSave.then(function(p){
+   //      //
+			// 	// })
+			// 	// Q.nfcall(api.createFile, contents).then(function(f){
+			// 	// 	programToSave = f;
+			// 	// 	console.log("in big promise thing");
+			// 	// });
+			// 	api.createFile(contents).then(function(f){
+			// 		programToSave = f;
+			// 		hasOpenedFile = true;
+			// 		console.log("inside promise");
+			// 		console.log("hasOpenedFile inside: ", hasOpenedFile);
+			// 		console.log("programToSave: " , programToSave);
+			// 	});
+
+			// 	console.log("after create file");
+
+			// } else {
+			// 	console.log("File has been opened");
+			// 	// programToSave.then(function(p){
+			// 	// 	api.autoSave(p)
+			// 	// });
+			// 	console.log(programToSave);
+			// 	api.autoSave(programToSave, contents);
+			// }
+
+
+		var offline = true;
 		// NOTE: Need condition to see if we are connected or not
 
-	 //    var savedProgram = programToSave.then(function (p) {
-	 //      if (p !== null && p.shared && !create) {
-	 //        return p; // Don't try to save shared files
-	 //      }
-	 //      if (create) {
-	 //        programToSave = storageAPI.then(function (api) {
-	 //          return api.createFile(useName);
-	 //        }).then(function (p) {
-	 //          // showShareContainer(p); TODO(joe): figure out where to put this
-	 //          history.pushState(null, null, "#program=" + p.getUniqueId());
-	 //          updateName(p); // sets filename
-	 //          enableFileOptions();
-	 //          return p;
-	 //        });
-	 //        return programToSave.then(function (p) {
-	 //          return save();
-	 //        });
-	 //      } else {
-	 //        return programToSave.then(function (p) {
-	 //          if (p === null) {
-	 //            return null;
-	 //          } else {
-	 //            return p.save(CPO.editor.cm.getValue(), false);
-	 //          }
-	 //        }).then(function (p) {
-	 //          if (p !== null) {
-	 //            window.flashMessage("Program saved as " + p.getName());
-	 //          }
-	 //          return p;
-	 //        });
-	 //      }
-	 //    });
-	 //    savedProgram.fail(function (err) {
-	 //      window.stickError("Unable to save", "Your internet connection may be down, or something else might be wrong with this site or saving to Google.  You should back up any changes to this program somewhere else.  You can try saving again to see if the problem was temporary, as well.");
-	 //      console.error(err);
-	 //    });
-	 //    return savedProgram;
+	    var savedProgram = programToSave.then(function (p) {
+	      if (p !== null && p.shared && !create) {
+	        return p; // Don't try to save shared files
+	      }
+	      if (create) {
+	      	// 3/4/19 -- condition for saving locally when creating a new file
+	      	if (offline){
+	      		api.createFile(contents).then(function(f){
+					programToSave = f;
+					hasOpenedFile = true;
+					//console.log("inside promise");
+					//console.log("hasOpenedFile inside: ", hasOpenedFile);
+					//console.log("programToSave: " , programToSave);
+	      		});
+	      	}
+	      	else {
+	      	console.log("Wrong spot");
+	        programToSave = storageAPI.then(function (api) {
+	          return api.createFile(useName);
+	        }).then(function (p) {
+	          // showShareContainer(p); TODO(joe): figure out where to put this
+	          history.pushState(null, null, "#program=" + p.getUniqueId());
+	          updateName(p); // sets filename
+	          enableFileOptions();
+	          return p;
+	        });
+	        return programToSave.then(function (p) {
+	          return save();
+	        });
+	      } 
+	  	}
+	  	else {
+	  		console.log("Not creating");
+	  		// 3/4/19 -- condition for autosaving locally after
+	  		// 			 previously saving or opening a file
+	  		if (offline){
+	  			console.log("In offline");
+	  			console.log(programToSave);
+	  			api.autoSave(programToSave, contents);
+	  		}
+	  		// Online -- Google Drive
+	  		else{
+
+		        return programToSave.then(function (p) {
+		          if (p === null) {
+		            return null;
+		          } else {
+		            return p.save(CPO.editor.cm.getValue(), false);
+		          }
+		        }).then(function (p) {
+		          if (p !== null) {
+		            window.flashMessage("Program saved as " + p.getName());
+		          }
+		          return p;
+		        });
+	    	}
+	      }
+	    });
+	    savedProgram.fail(function (err) {
+	      window.stickError("Unable to save", "Your internet connection may be down, or something else might be wrong with this site or saving to Google.  You should back up any changes to this program somewhere else.  You can try saving again to see if the problem was temporary, as well.");
+	      console.error(err);
+	    });
+	    return savedProgram;
 	  }
 
 	  /* Open file picker to save file with new name */
