@@ -1206,7 +1206,7 @@
 	    if (hasOpenedFile){
 	    	create = false;
 	    }
-
+	    	//Test commnent
 
 			if (create){
 				console.log("File has not been opened");
