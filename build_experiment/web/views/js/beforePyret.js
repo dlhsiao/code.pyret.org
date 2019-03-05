@@ -1178,6 +1178,9 @@
 	    with the current editor contents.  If no filename has been set yet, just
 	    set the name to "Untitled".
 	   */
+	  // THESE SHOULD BE GLOBALS
+	  var offline = true;
+	  var filePath;
 	  function save(newFilename) {
 	    var useName, create;
 
@@ -1206,38 +1209,10 @@
 	    if (hasOpenedFile){
 	    	create = false;
 	    }
+	    else{
+	    	create = true;
+	    }
 
-
-			// if (create){
-			// 	console.log("File has not been opened");
-			// 	// programToSave.then(function(p){
-   //      //
-			// 	// })
-			// 	// Q.nfcall(api.createFile, contents).then(function(f){
-			// 	// 	programToSave = f;
-			// 	// 	console.log("in big promise thing");
-			// 	// });
-			// 	api.createFile(contents).then(function(f){
-			// 		programToSave = f;
-			// 		hasOpenedFile = true;
-			// 		console.log("inside promise");
-			// 		console.log("hasOpenedFile inside: ", hasOpenedFile);
-			// 		console.log("programToSave: " , programToSave);
-			// 	});
-
-			// 	console.log("after create file");
-
-			// } else {
-			// 	console.log("File has been opened");
-			// 	// programToSave.then(function(p){
-			// 	// 	api.autoSave(p)
-			// 	// });
-			// 	console.log(programToSave);
-			// 	api.autoSave(programToSave, contents);
-			// }
-
-
-		var offline = true;
 		// NOTE: Need condition to see if we are connected or not
 
 	    var savedProgram = programToSave.then(function (p) {
@@ -1248,15 +1223,11 @@
 	      	// 3/4/19 -- condition for saving locally when creating a new file
 	      	if (offline){
 	      		api.createFile(contents).then(function(f){
-					programToSave = f;
+					filePath = f;  
 					hasOpenedFile = true;
-					//console.log("inside promise");
-					//console.log("hasOpenedFile inside: ", hasOpenedFile);
-					//console.log("programToSave: " , programToSave);
 	      		});
 	      	}
 	      	else {
-	      	console.log("Wrong spot");
 	        programToSave = storageAPI.then(function (api) {
 	          return api.createFile(useName);
 	        }).then(function (p) {
@@ -1277,8 +1248,8 @@
 	  		// 			 previously saving or opening a file
 	  		if (offline){
 	  			console.log("In offline");
-	  			console.log(programToSave);
-	  			api.autoSave(programToSave, contents);
+	  			console.log(filePath);
+	  			api.autoSave(filePath, contents);
 	  		}
 	  		// Online -- Google Drive
 	  		else{
@@ -1307,46 +1278,42 @@
 
 	  /* Open file picker to save file with new name */
 	  function saveAs() {
-	  	// (Josh) 2/28/19: Might want to have this call save somehow
-	  	let loc = window.location.pathname;
-	  	var contents = CPO.editor.cm.getValue();
-	  	storageAPI = localFileSaveAPI(loc);
-	    var api = storageAPI.api;
+	    if (menuItemDisabled("saveas")) {
+	      return;
+	    }
+	    programToSave.then(function (p) {
+	      var name = p === null ? "Untitled" : p.getName();
+	      var saveAsPrompt = new modalPrompt({
+	        title: "Save a copy",
+	        style: "text",
+	        options: [{
+	          message: "The name for the copy:",
+	          defaultValue: name
+	        }]
+	      });
+	      if (offline){
+	        // 3/5/19 -- Omitting the 'newFileName' argument to save()
+	        //		     Opens the filePicker save prompt 
+	        console.log("Here");
+	        hasOpenedFile = false;
+	        return save();
+	      }
 
+	      // User is online -- this is for GDrive
+	      else{
+	      return saveAsPrompt.show().then(function (newName) {
+	        if (newName === null) {
+	          return null;
+	        }
+	        window.stickMessage("Saving...");
+	        return save(newName);
 
-		api.createFile(contents).then(function(f){
-					programToSave = f;
-					hasOpenedFile = true;
-					console.log("inside promise");
-					console.log("programToSave: " , programToSave);
-				});
+	      }).fail(function (err) {
+	        console.error("Failed to rename: ", err);
+	        window.flashError("Failed to rename file");
+	      });
+	    }});
 
-	  	// (Josh) 2/28/19: All the logic below this is for googleDrive
-	  	//                 We can add it back once we put in the "isConnected" functionality
-	    // if (menuItemDisabled("saveas")) {
-	    //   return;
-	    // }
-	    // programToSave.then(function (p) {
-	    //   var name = p === null ? "Untitled" : p.getName();
-	    //   var saveAsPrompt = new modalPrompt({
-	    //     title: "Save a copy",
-	    //     style: "text",
-	    //     options: [{
-	    //       message: "The name for the copy:",
-	    //       defaultValue: name
-	    //     }]
-	    //   });
-	    //   return saveAsPrompt.show().then(function (newName) {
-	    //     if (newName === null) {
-	    //       return null;
-	    //     }
-	    //     window.stickMessage("Saving...");
-	    //     return save(newName);
-	    //   }).fail(function (err) {
-	    //     console.error("Failed to rename: ", err);
-	    //     window.flashError("Failed to rename file");
-	    //   });
-	    // });
 	  }
 
 
@@ -1360,13 +1327,15 @@
 			// SHOULD DO THIS ONCE GLOBALLY
 	    	storageAPI = localFileSaveAPI(loc);
 	    	var api = storageAPI.api;
+
 	    	api.getFileContents().then(function(arr){
-				programToSave = arr[0];
+				//programToSave = arr[0];
+				filePath = arr[0];
 				hasOpenedFile = true;
 				console.log(arr);
 				CPO.editor.cm.setValue(arr[1]);
 				console.log("inside open promise");
-				console.log("programToSave: " , programToSave);
+				console.log("filePath: " , filePath);
 			});
 		}
 
