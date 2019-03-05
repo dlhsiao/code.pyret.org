@@ -1223,7 +1223,7 @@
 	      	// 3/4/19 -- condition for saving locally when creating a new file
 	      	if (offline){
 	      		api.createFile(contents).then(function(f){
-					filePath = f;  
+					filePath = f;
 					hasOpenedFile = true;
 	      		});
 	      	}
@@ -1240,7 +1240,7 @@
 	        return programToSave.then(function (p) {
 	          return save();
 	        });
-	      } 
+	      }
 	  	}
 	  	else {
 	  		console.log("Not creating");
@@ -1293,7 +1293,7 @@
 	      });
 	      if (offline){
 	        // 3/5/19 -- Omitting the 'newFileName' argument to save()
-	        //		     Opens the filePicker save prompt 
+	        //		     Opens the filePicker save prompt
 	        console.log("Here");
 	        hasOpenedFile = false;
 	        return save();
@@ -1341,13 +1341,25 @@
 
 
 	  function rename() {
+			let loc = window.location.pathname;
+
+			// SHOULD DO THIS ONCE GLOBALLY
+	    	storageAPI = localFileSaveAPI(loc);
+	    	var api = storageAPI.api;
 	    programToSave.then(function (p) {
+				var defaultName;
+				if (offline){
+					defaultName = filePath.substr(filePath.lastIndexOf("/")+1);
+				}
+				else {
+					defaultName = p.getName();
+				}
 	      var renamePrompt = new modalPrompt({
 	        title: "Rename this file",
 	        style: "text",
 	        options: [{
 	          message: "The new name for the file:",
-	          defaultValue: p.getName()
+	          defaultValue: defaultName
 	        }]
 	      });
 	      // null return values are for the "cancel" path
@@ -1356,7 +1368,16 @@
 	          return null;
 	        }
 	        window.stickMessage("Renaming...");
-	        programToSave = p.rename(newName);
+					console.log(newName);
+					if (offline){
+						var newFilePath = filePath.substr(0, filePath.lastIndexOf("/")+1) + newName;
+						console.log(newFilePath);
+						api.rename(filePath, newFilePath);
+						filePath = newFilePath;
+					}
+					else {
+						programToSave = p.rename(newName);
+					}
 	        return programToSave;
 	      }).then(function (p) {
 	        if (p === null) {
