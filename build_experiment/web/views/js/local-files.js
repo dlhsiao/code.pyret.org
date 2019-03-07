@@ -123,6 +123,13 @@ window.localFileSaveAPI = function createProgramCollectionAPI(baseCollection) {
         });
       },
 
+      rename: function(filePath, newFilePath){
+        var fs = require('fs');
+        fs.rename(filePath, newFilePath, function(err) {
+            if ( err ) console.log('ERROR: ' + err);
+        });
+
+      },
       /* Gives the user a dialog window to save a file with the given contents */
       createFile: function(contents) {
         // THIS IS ALL TEMPORARY -- NEED TO MOVE THIS INTO A FUNCTION
