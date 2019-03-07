@@ -14,7 +14,11 @@ require('electron-handlebars') ({
 let win
 
 function createWindow() {
-  let win = new BrowserWindow({ width: 800, height: 600})
+  let win = new BrowserWindow({
+    width: 800,
+    height: 600,
+    icon: path.join(__dirname, 'assets/icons/png/64x64.png')
+  })
 
   win.loadURL(url.format({
     pathname: path.join(__dirname, './build/web/views/editor.html'), //./code.pyret.org/build/web/views/editor.html
