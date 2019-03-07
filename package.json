@@ -1,6 +1,6 @@
 {
   "name": "code.pyret.org",
-  "productName": "code.pyret.org",
+  "productName": "PyretApp",
   "version": "0.0.0",
   "description": "A simple IDE for Pyret",
   "main": "index.js",
@@ -84,9 +84,10 @@
     "mocha": "heroku local:run mocha",
     "start-web": "heroku local:run supervisor --poll-interval 700 --watch src/run.js,src/server.js src/run.js & heroku local:run webpack-dev-server --port 5001 --watch",
     "start-app": "heroku local:run electron ./main.js",
-    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
-    "package-win": "electron-packager . electron-tutorial-app --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"code.pyret.org\"",
-    "package-linux": "electron-packager . electron-tutorial-app --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds"
+    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/pyretLogo.icns --prune=true --out=release-builds",
+    "package-win": "electron-packager . electron-tutorial-app --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/pyretLogo.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"PyretApp\"",
+    "package-linux": "electron-packager . electron-tutorial-app --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds",
+    "create-installer-mac": "electron-installer-dmg ./release-builds/PyretApp-darwin-x64/PyretApp.app PyretApp --out=release-builds --overwrite --icon=assets/icons/mac/icon.icns"
   },
   "repository": {
     "type": "git",
@@ -97,6 +98,7 @@
   "devDependencies": {
     "chromedriver": "^2.36.2",
     "electron": "^4.0.5",
+    "electron-installer-dmg": "^2.0.0",
     "electron-packager": "^13.1.1",
     "selenium-webdriver": "^3.6.0",
     "webpack-cli": "^3.1.2"
