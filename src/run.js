@@ -36,7 +36,7 @@ var res = Q.fcall(function(db) {
     },
     version: process.env["CURRENT_PYRET_RELEASE"],
     pyret: process.env["PYRET"],
-    mode: process.env["MODE"]
+    mode: "/" //process.env["MODE"]
   }, function(app) {
     console.log("Server ready.");
   });

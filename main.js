@@ -3,12 +3,14 @@ const url = require('url')
 const path = require('path')
 const {ipcMain} = require('electron')
 
+var BUILD_DIR = "../"
+
 require('electron-handlebars') ({
-  MODE: process.env["MODE"],
-  LOG_URL: process.env["LOG_URL"],
-  BASE_URL: process.env["BASE_URL"],
+  MODE: BUILD_DIR,
+  LOG_URL: process.env.LOG_URL,
+  BASE_URL: process.env.BASE_URL,
   CSRF_TOKEN: "",
-  GOOGLE_API_KEY: ""
+  GOOGLE_API_KEY: process.env.GOOGLE_API_KEY
 });
 
 let win
@@ -28,11 +30,9 @@ function createWindow() {
 
   win.webContents.openDevTools()
 
-  win.on('closed', () => {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    win = null
+  win.on('close', function(e) {
+    e.preventDefault();
+    win.destroy();
   })
 
   //win.loadFile('./code.pyret.org/build_experiment/web/views/editor.html')//./code.pyret.org/build/web/views/editor.html
