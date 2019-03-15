@@ -87,7 +87,7 @@
     "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/pyretLogo.icns --prune=true --out=release-builds",
     "package-win": "electron-packager . electron-tutorial-app --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/pyretLogo.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"PyretApp\"",
     "package-linux": "electron-packager . electron-tutorial-app --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds",
-    "create-installer-mac": "electron-installer-dmg ./release-builds/PyretApp-darwin-x64/PyretApp.app PyretApp --out=release-builds --overwrite --icon=assets/icons/mac/pyretLogo.icns"
+    "create-installer-mac": "electron-installer-dmg ./release-builds/PyretApp-darwin-x64/PyretApp.app PyretApp --out=release-builds --overwrite --icon=assets/icons/mac/pyretLogo.icns --background=assets/background.png"
   },
   "repository": {
     "type": "git",
@@ -100,6 +100,7 @@
     "electron": "^4.0.5",
     "electron-installer-dmg": "^2.0.0",
     "electron-packager": "^13.1.1",
+    "electron-winstaller": "^3.0.4",
     "selenium-webdriver": "^3.6.0",
     "webpack-cli": "^3.1.2"
   }
