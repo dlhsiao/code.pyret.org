@@ -87,9 +87,10 @@
     "start-app": "electron ./main.js",
     "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/pyretLogo.icns --prune=true --out=release-builds",
     "package-win": "electron-packager . PyretApp --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/pyretLogo.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"PyretApp\"",
-    "package-linux": "electron-packager . PyretApp --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds",
+    "package-linux": "electron-packager . code.pyret.org --overwrite --asar --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds",
     "create-installer-mac": "electron-installer-dmg ./release-builds/PyretApp-darwin-x64/PyretApp.app PyretApp --out=release-builds --overwrite --icon=assets/icons/mac/pyretLogo.icns --background=assets/background.png",
-    "create-installer-win": "electron-installer-windows --src ./release-builds/PyretApp-win32-x64/ --dest ./release-builds --icon assets/icon/win/pyretLogo.ico"
+    "create-installer-win": "electron-installer-windows --src ./release-builds/PyretApp-win32-x64/ --dest ./release-builds --icon assets/icon/win/pyretLogo.ico",
+    "create-debian-installer": "electron-installer-debian --src ./release-builds/code.pyret.org-linux-x64/ --arch amd64 --config debian.json"
   },
   "repository": {
     "type": "git",
