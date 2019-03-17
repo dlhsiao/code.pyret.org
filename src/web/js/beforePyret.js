@@ -1,5 +1,7 @@
 /* global $ jQuery CPO CodeMirror storageAPI Q createProgramCollectionAPI makeShareAPI */
 
+var connected = false; // Are you connected to google drive
+
 var shareAPI = makeShareAPI(process.env.CURRENT_PYRET_RELEASE);
 
 var url = require('url.js');
@@ -25,6 +27,7 @@ window.clearFlash = function() {
   $(".notificationArea").empty();
 }
 window.stickError = function(message, more) {
+  CPO.sayAndForget(message);
   clearFlash();
   var err = $("<div>").addClass("error").text(message);
   if(more) {
@@ -34,18 +37,21 @@ window.stickError = function(message, more) {
   $(".notificationArea").prepend(err);
 };
 window.flashError = function(message) {
+  CPO.sayAndForget(message);
   clearFlash();
   var err = $("<div>").addClass("error").text(message);
   $(".notificationArea").prepend(err);
   err.fadeOut(7000);
 };
 window.flashMessage = function(message) {
+  CPO.sayAndForget(message);
   clearFlash();
   var msg = $("<div>").addClass("active").text(message);
   $(".notificationArea").prepend(msg);
   msg.fadeOut(7000);
 };
 window.stickMessage = function(message) {
+  CPO.sayAndForget(message);
   clearFlash();
   var err = $("<div>").addClass("active").text(message);
   $(".notificationArea").prepend(err);
@@ -132,7 +138,7 @@ $(function() {
       initial = options.initial;
     }
 
-    var textarea = jQuery("<textarea>");
+    var textarea = jQuery("<textarea aria-hidden='true'>");
     textarea.val(initial);
     container.append(textarea);
 
@@ -154,13 +160,15 @@ $(function() {
       });
     }
 
-    // place a vertical line at character 80 in code editor, not repl
+    // place a vertical line at character 80 in code editor, and not repl
+    var CODE_LINE_WIDTH = 100;
+
     var rulers, rulersMinCol;
     if (options.simpleEditor) {
       rulers = [];
     } else{
-      rulers = [{color: "#317BCF", column: 80, lineStyle: "dashed", className: "hidden"}];
-      rulersMinCol = 80;
+      rulers = [{color: "#317BCF", column: CODE_LINE_WIDTH, lineStyle: "dashed", className: "hidden"}];
+      rulersMinCol = CODE_LINE_WIDTH;
     }
 
     var cmOptions = {
@@ -195,11 +203,12 @@ $(function() {
 
     var CM = CodeMirror.fromTextArea(textarea[0], cmOptions);
 
-
     if (useLineNumbers) {
       CM.display.wrapper.appendChild(mkWarningUpper()[0]);
       CM.display.wrapper.appendChild(mkWarningLower()[0]);
     }
+
+    getTopTierMenuitems();
 
     return {
       cm: CM,
@@ -207,7 +216,8 @@ $(function() {
       run: function() {
         runFun(CM.getValue());
       },
-      focus: function() { CM.focus(); }
+      focus: function() { CM.focus(); },
+      focusCarousel: null //initFocusCarousel
     };
   };
   CPO.RUN_CODE = function() {
@@ -228,6 +238,13 @@ $(function() {
     });
   }
 
+  // THIS IS FOR DISPLAYING FILE-SAVE ELEMENTS OFFLINE 
+  // -- WITHOUT CONNECTING TO GDRIVE
+  // enableFileOptions();
+  // //getTopTierMenuitems();
+  // $(".loginOnly").show();
+  // $(".logoutOnly").hide();
+
   storageAPI.then(function(api) {
     api.collection.then(function() {
       $(".loginOnly").show();
@@ -244,11 +261,18 @@ $(function() {
   $("#connectButton").click(function() {
     $("#connectButton").text("Connecting...");
     $("#connectButton").attr("disabled", "disabled");
+    $('#connectButtonli').attr('disabled', 'disabled');
+    $("#connectButton").attr("tabIndex", "-1");
+    //$("#topTierUl").attr("tabIndex", "0");
+    getTopTierMenuitems();
+
     storageAPI = createProgramCollectionAPI("code.pyret.org", false);
     storageAPI.then(function(api) {
       api.collection.then(function() {
         $(".loginOnly").show();
         $(".logoutOnly").hide();
+        document.activeElement.blur();
+        $("#bonniemenubutton").focus();
         setUsername($("#username"));
         if(params["get"] && params["get"]["program"]) {
           var toLoad = api.api.getFileById(params["get"]["program"]);
@@ -262,6 +286,11 @@ $(function() {
       api.collection.fail(function() {
         $("#connectButton").text("Connect to Google Drive");
         $("#connectButton").attr("disabled", false);
+        $('#connectButtonli').attr('disabled', false);
+        //$("#connectButton").attr("tabIndex", "0");
+        document.activeElement.blur();
+        $("#connectButton").focus();
+        //$("#topTierUl").attr("tabIndex", "-1");
       });
     });
     storageAPI = storageAPI.then(function(api) { return api.api; });
@@ -288,6 +317,20 @@ $(function() {
           id: params["get"]["share"]
         });
       programLoad = api.getSharedFileById(params["get"]["share"]);
+      programLoad.then(function(file) {
+        // NOTE(joe): If the current user doesn't own or have access to this file
+        // (or isn't logged in) this will simply fail with a 401, so we don't do
+        // any further permission checking before showing the link.
+        file.getOriginal().then(function(response) {
+          console.log("Response for original: ", response);
+          var original = $("#open-original").show().off("click");
+          var id = response.result.value;
+          original.removeClass("disabled");
+          original.click(function() {
+            window.open(window.APP_BASE_URL + "/editor#program=" + id, "_blank");
+          });
+        });
+      });
     }
     if(programLoad) {
       programLoad.fail(function(err) {
@@ -349,14 +392,143 @@ $(function() {
     });
   }
 
+  function say(msg, forget) {
+    if (msg === "") return;
+    var announcements = document.getElementById("announcementlist");
+    var li = document.createElement("LI");
+    li.appendChild(document.createTextNode(msg));
+    announcements.insertBefore(li, announcements.firstChild);
+    if (forget) {
+      setTimeout(function() {
+        announcements.removeChild(li);
+      }, 1000);
+    }
+  }
+
+  function sayAndForget(msg) {
+    //console.log('doing sayAndForget', msg);
+    say(msg, true);
+  }
+
+  function cycleAdvance(currIndex, maxIndex, reverseP) {
+    var nextIndex = currIndex + (reverseP? -1 : +1);
+    nextIndex = ((nextIndex % maxIndex) + maxIndex) % maxIndex;
+    return nextIndex;
+  }
+
+  function populateFocusCarousel(editor) {
+    if (!editor.focusCarousel) {
+      editor.focusCarousel = [];
+    }
+    var fc = editor.focusCarousel;
+    var docmain = document.getElementById("main");
+    if (!fc[0]) {
+      var toolbar = document.getElementById('Toolbar');
+      fc[0] = toolbar;
+      //fc[0] = document.getElementById("headeronelegend");
+      //getTopTierMenuitems();
+      //fc[0] = document.getElementById('bonniemenubutton');
+    }
+    if (!fc[1]) {
+      var docreplMain = docmain.getElementsByClassName("replMain");
+      var docreplMain0;
+      if (docreplMain.length === 0) {
+        docreplMain0 = undefined;
+      } else if (docreplMain.length === 1) {
+        docreplMain0 = docreplMain[0];
+      } else {
+        for (var i = 0; i < docreplMain.length; i++) {
+          if (docreplMain[i].innerText !== "") {
+            docreplMain0 = docreplMain[i];
+          }
+        }
+      }
+      fc[1] = docreplMain0;
+    }
+    if (!fc[2]) {
+      var docrepl = docmain.getElementsByClassName("repl");
+      var docreplcode = docrepl[0].getElementsByClassName("prompt-container")[0].
+        getElementsByClassName("CodeMirror")[0];
+      fc[2] = docreplcode;
+    }
+    if (!fc[3]) {
+      fc[3] = document.getElementById("announcements");
+    }
+  }
+
+  function cycleFocus(reverseP) {
+    //console.log('doing cycleFocus', reverseP);
+    var editor = this.editor;
+    populateFocusCarousel(editor);
+    var fCarousel = editor.focusCarousel;
+    var maxIndex = fCarousel.length;
+    var currentFocusedElt = fCarousel.find(function(node) {
+      if (!node) {
+        return false;
+      } else {
+        return node.contains(document.activeElement);
+      }
+    });
+    var currentFocusIndex = fCarousel.indexOf(currentFocusedElt);
+    var nextFocusIndex = currentFocusIndex;
+    var focusElt;
+    do {
+      nextFocusIndex = cycleAdvance(nextFocusIndex, maxIndex, reverseP);
+      focusElt = fCarousel[nextFocusIndex];
+      //console.log('trying focusElt', focusElt);
+    } while (!focusElt);
+
+    var focusElt0;
+    if (focusElt.classList.contains('toolbarregion')) {
+      //console.log('settling on toolbar region')
+      getTopTierMenuitems();
+      focusElt0 = document.getElementById('bonniemenubutton');
+    } else if (focusElt.classList.contains("replMain") ||
+      focusElt.classList.contains("CodeMirror")) {
+      //console.log('settling on defn window')
+      var textareas = focusElt.getElementsByTagName("textarea");
+      //console.log('txtareas=', textareas)
+      //console.log('txtarea len=', textareas.length)
+      if (textareas.length === 0) {
+        //console.log('I')
+        focusElt0 = focusElt;
+      } else if (textareas.length === 1) {
+        //console.log('settling on inter window')
+        focusElt0 = textareas[0];
+      } else {
+        //console.log('settling on defn window')
+        /*
+        for (var i = 0; i < textareas.length; i++) {
+          if (textareas[i].getAttribute('tabIndex')) {
+            focusElt0 = textareas[i];
+          }
+        }
+        */
+        focusElt0 = textareas[textareas.length-1];
+        focusElt0.removeAttribute('tabIndex');
+      }
+    } else {
+      //console.log('settling on announcement region', focusElt)
+      focusElt0 = focusElt;
+    }
+
+    document.activeElement.blur();
+    focusElt0.click();
+    focusElt0.focus();
+    //console.log('(cf)docactelt=', document.activeElement);
+  }
+
   var programLoaded = loadProgram(initialProgram);
 
   var programToSave = initialProgram;
 
   function showShareContainer(p) {
+    //console.log('called showShareContainer');
     if(!p.shared) {
       $("#shareContainer").empty();
+      $('#publishli').show();
       $("#shareContainer").append(shareAPI.makeShareLink(p));
+      getTopTierMenuitems();
     }
   }
 
@@ -377,7 +549,6 @@ $(function() {
     return $("#" + id).hasClass("disabled");
   }
 
-
   function newEvent(e) {
     window.open(window.APP_BASE_URL + "/editor");
   }
@@ -388,134 +559,229 @@ $(function() {
   }
 
   /*
-    save : string (optional) -> undef
+      save : string (optional) -> undef
+       If a string argument is provided, create a new file with that name and save
+      the editor contents in that file.
+       If no filename is provided, save the existing file referenced by the editor
+      with the current editor contents.  If no filename has been set yet, just
+      set the name to "Untitled".
+     */
+    // THESE SHOULD BE GLOBALS
+    var offline = true;
+    var filePath;
+    function save(newFilename) {
+      var useName, create;
 
-    If a string argument is provided, create a new file with that name and save
-    the editor contents in that file.
-
-    If no filename is provided, save the existing file referenced by the editor
-    with the current editor contents.  If no filename has been set yet, just
-    set the name to "Untitled".
-
-  */
-  function save(newFilename) {
-    if(newFilename !== undefined) {
-      var useName = newFilename;
-      var create = true;
-    }
-    else if(filename === false) {
-      filename = "Untitled";
-      var create = true;
-    }
-    else {
-      var useName = filename; // A closed-over variable
-      var create = false;
-    }
-    window.stickMessage("Saving...");
-    var savedProgram = programToSave.then(function(p) {
-      if(p !== null && p.shared && !create) {
-        return p; // Don't try to save shared files
+      if (newFilename !== undefined) {
+        useName = newFilename;
+        create = true;
+      } else if (filename === false) {
+        filename = "Untitled";
+        create = true;
+      } else {
+        useName = filename; // A closed-over variable
+        create = false;
       }
-      if(create) {
-        programToSave = storageAPI
-          .then(function(api) { return api.createFile(useName); })
-          .then(function(p) {
+
+      console.log("hasOpenedFile: ", hasOpenedFile);
+      console.log("Create: ", create);
+      window.stickMessage("Saving...");
+
+      var contents = CPO.editor.cm.getValue();
+    let loc = window.location.pathname;
+
+    // SHOULD DO THIS ONCE GLOBALLY
+      storageAPI = localFileSaveAPI(loc);
+
+      var api = storageAPI.api;
+      if (hasOpenedFile){
+        create = false;
+      }
+      else{
+        create = true;
+      }
+
+    // NOTE: Need condition to see if we are connected or not
+
+      var savedProgram = programToSave.then(function (p) {
+        if (p !== null && p.shared && !create) {
+          return p; // Don't try to save shared files
+        }
+        if (create) {
+          // 3/4/19 -- condition for saving locally when creating a new file
+          if (offline){
+            api.createFile(contents).then(function(f){
+          filePath = f;
+          hasOpenedFile = true;
+            });
+          }
+          else {
+          programToSave = storageAPI.then(function (api) {
+            return api.createFile(useName);
+          }).then(function (p) {
             // showShareContainer(p); TODO(joe): figure out where to put this
             history.pushState(null, null, "#program=" + p.getUniqueId());
             updateName(p); // sets filename
             enableFileOptions();
             return p;
           });
-        return programToSave.then(function(p) {
-          return save();
-        });
+          return programToSave.then(function (p) {
+            return save();
+          });
+        }
       }
       else {
-        return programToSave.then(function(p) {
-          if(p === null) {
-            return null;
-          }
-          else {
-            return p.save(CPO.editor.cm.getValue(), false);
-          }
-        }).then(function(p) {
-          if(p !== null) {
-            window.flashMessage("Program saved as " + p.getName());
-          }
-          return p;
-        });
-      }
-    });
-    savedProgram.fail(function(err) {
-      window.stickError("Unable to save", "Your internet connection may be down, or something else might be wrong with this site or saving to Google.  You should back up any changes to this program somewhere else.  You can try saving again to see if the problem was temporary, as well.");
-      console.error(err);
-    });
-    return savedProgram;
-  }
+        console.log("Not creating");
+        // 3/4/19 -- condition for autosaving locally after
+        //       previously saving or opening a file
+        if (offline){
+          console.log("In offline");
+          console.log(filePath);
+          api.autoSave(filePath, contents);
+        }
+        // Online -- Google Drive
+        else{
 
+            return programToSave.then(function (p) {
+              if (p === null) {
+                return null;
+              } else {
+                return p.save(CPO.editor.cm.getValue(), false);
+              }
+            }).then(function (p) {
+              if (p !== null) {
+                window.flashMessage("Program saved as " + p.getName());
+              }
+              return p;
+            });
+        }
+        }
+      });
+      savedProgram.fail(function (err) {
+        window.stickError("Unable to save", "Your internet connection may be down, or something else might be wrong with this site or saving to Google.  You should back up any changes to this program somewhere else.  You can try saving again to see if the problem was temporary, as well.");
+        console.error(err);
+      });
+      return savedProgram;
+    }
+
+  
+  /* Open file picker to save file with new name */
   function saveAs() {
-    if(menuItemDisabled("saveas")) { return; }
-    programToSave.then(function(p) {
+    if (menuItemDisabled("saveas")) {
+      return;
+    }
+    programToSave.then(function (p) {
       var name = p === null ? "Untitled" : p.getName();
       var saveAsPrompt = new modalPrompt({
         title: "Save a copy",
         style: "text",
-        options: [
-          {
-            message: "The name for the copy:",
-            defaultValue: name
-          }
-        ]
+        options: [{
+          message: "The name for the copy:",
+          defaultValue: name
+        }]
       });
-      return saveAsPrompt.show().then(function(newName) {
-        if(newName === null) { return null; }
+      if (offline){
+        // 3/5/19 -- Omitting the 'newFileName' argument to save()
+        //         Opens the filePicker save prompt
+        console.log("Here");
+        hasOpenedFile = false;
+        return save();
+      }
+
+      // User is online -- this is for GDrive
+      else{
+      return saveAsPrompt.show().then(function (newName) {
+        if (newName === null) {
+          return null;
+        }
         window.stickMessage("Saving...");
         return save(newName);
-      }).
-      fail(function(err) {
+
+      }).fail(function (err) {
         console.error("Failed to rename: ", err);
         window.flashError("Failed to rename file");
       });
-    });
+    }});
   }
 
-  function rename() {
-    programToSave.then(function(p) {
-      var renamePrompt = new modalPrompt({
-        title: "Rename this file",
-        style: "text",
-        options: [
-          {
+
+// (Josh) 2/28/19 -- Using this as indicator if the file in the editor constitutes new or
+    //           existing file
+    var hasOpenedFile = false;
+
+    function openEvent() {
+      let loc = window.location.pathname;
+
+      // SHOULD DO THIS ONCE GLOBALLY
+        storageAPI = localFileSaveAPI(loc);
+        var api = storageAPI.api;
+
+        api.getFileContents().then(function(arr){
+        //programToSave = arr[0];
+        filePath = arr[0];
+        hasOpenedFile = true;
+        console.log(arr);
+        CPO.editor.cm.setValue(arr[1]);
+        console.log("inside open promise");
+        console.log("filePath: " , filePath);
+      });
+    }
+
+
+    function rename() {
+      let loc = window.location.pathname;
+
+      // SHOULD DO THIS ONCE GLOBALLY
+        storageAPI = localFileSaveAPI(loc);
+        var api = storageAPI.api;
+      programToSave.then(function (p) {
+        var defaultName;
+        if (offline){
+          defaultName = filePath.substr(filePath.lastIndexOf("/")+1);
+        }
+        else {
+          defaultName = p.getName();
+        }
+        var renamePrompt = new modalPrompt({
+          title: "Rename this file",
+          style: "text",
+          options: [{
             message: "The new name for the file:",
-            defaultValue: p.getName()
+            defaultValue: defaultName
+          }]
+        });
+        // null return values are for the "cancel" path
+        return renamePrompt.show().then(function (newName) {
+          if (newName === null) {
+            return null;
           }
-        ]
+          window.stickMessage("Renaming...");
+          console.log(newName);
+          if (offline){
+            var newFilePath = filePath.substr(0, filePath.lastIndexOf("/")+1) + newName;
+            console.log(newFilePath);
+            api.rename(filePath, newFilePath);
+            filePath = newFilePath;
+          }
+          else {
+            programToSave = p.rename(newName);
+          }
+          return programToSave;
+        }).then(function (p) {
+          if (p === null) {
+            return null;
+          }
+          updateName(p);
+          window.flashMessage("Program saved as " + p.getName());
+        }).fail(function (err) {
+          console.error("Failed to rename: ", err);
+          window.flashError("Failed to rename file");
+        });
+      }).fail(function (err) {
+        console.error("Unable to rename: ", err);
       });
-      // null return values are for the "cancel" path
-      return renamePrompt.show().then(function(newName) {
-        if(newName === null) {
-          return null;
-        }
-        window.stickMessage("Renaming...");
-        programToSave = p.rename(newName);
-        return programToSave;
-      })
-      .then(function(p) {
-        if(p === null) {
-          return null;
-        }
-        updateName(p);
-        window.flashMessage("Program saved as " + p.getName());
-      })
-      .fail(function(err) {
-        console.error("Failed to rename: ", err);
-        window.flashError("Failed to rename file");
-      });
-    })
-    .fail(function(err) {
-      console.error("Unable to rename: ", err);
-    });
-  }
+    }
+
 
   $("#runButton").click(function() {
     CPO.autoSave();
@@ -525,11 +791,353 @@ $(function() {
   $("#save").click(saveEvent);
   $("#rename").click(rename);
   $("#saveas").click(saveAs);
+  $("#open").click(openEvent);
 
-  shareAPI.makeHoverMenu($("#filemenu"), $("#filemenuContents"), false, function(){});
-  shareAPI.makeHoverMenu($("#bonniemenu"), $("#bonniemenuContents"), false, function(){});
+
+  var focusableElts = $(document).find('#header .focusable');
+  //console.log('focusableElts=', focusableElts)
+  var theToolbar = $(document).find('#Toolbar');
+
+  function getTopTierMenuitems() {
+    //console.log('doing getTopTierMenuitems')
+    var topTierMenuitems = $(document).find('#header ul li.topTier').toArray();
+    topTierMenuitems = topTierMenuitems.
+                        filter(elt => !(elt.style.display === 'none' ||
+                                        elt.getAttribute('disabled') === 'disabled'));
+    var numTopTierMenuitems = topTierMenuitems.length;
+    for (var i = 0; i < numTopTierMenuitems; i++) {
+      var ithTopTierMenuitem = topTierMenuitems[i];
+      var iChild = $(ithTopTierMenuitem).children().first();
+      //console.log('iChild=', iChild);
+      iChild.find('.focusable').
+        attr('aria-setsize', numTopTierMenuitems.toString()).
+        attr('aria-posinset', (i+1).toString());
+    }
+    return topTierMenuitems;
+  }
+
+  function updateEditorHeight() {
+    var toolbarHeight = document.getElementById('topTierUl').scrollHeight;
+    // gets bumped to 67 on initial resize perturbation, but actual value is indeed 40
+    if (toolbarHeight < 80) toolbarHeight = 40;
+    toolbarHeight += 'px';
+    document.getElementById('REPL').style.paddingTop = toolbarHeight;
+    var docMain = document.getElementById('main');
+    var docReplMain = docMain.getElementsByClassName('replMain');
+    if (docReplMain.length !== 0) {
+      docReplMain[0].style.paddingTop = toolbarHeight;
+    }
+  }
+
+  $(window).on('resize', updateEditorHeight);
+
+  function insertAriaPos(submenu) {
+    //console.log('doing insertAriaPos', submenu)
+    var arr = submenu.toArray();
+    //console.log('arr=', arr);
+    var len = arr.length;
+    for (var i = 0; i < len; i++) {
+      var elt = arr[i];
+      //console.log('elt', i, '=', elt);
+      elt.setAttribute('aria-setsize', len.toString());
+      elt.setAttribute('aria-posinset', (i+1).toString());
+    }
+  }
+
+
+  document.addEventListener('click', function () {
+    hideAllTopMenuitems();
+  });
+
+  theToolbar.click(function (e) {
+    e.stopPropagation();
+  });
+
+  theToolbar.keydown(function (e) {
+    //console.log('toolbar keydown', e);
+    //most any key at all
+    var kc = e.keyCode;
+    if (kc === 27) {
+      // escape
+      hideAllTopMenuitems();
+      //console.log('calling cycleFocus from toolbar')
+      CPO.cycleFocus();
+      e.stopPropagation();
+    } else if (kc === 9 || kc === 37 || kc === 38 || kc === 39 || kc === 40) {
+      // an arrow
+      var target = $(this).find('[tabIndex=-1]');
+      getTopTierMenuitems();
+      document.activeElement.blur(); //needed?
+      target.first().focus(); //needed?
+      //console.log('docactelt=', document.activeElement);
+      e.stopPropagation();
+    } else {
+      hideAllTopMenuitems();
+    }
+  });
+
+  function clickTopMenuitem(e) {
+    hideAllTopMenuitems();
+    var thisElt = $(this);
+    //console.log('doing clickTopMenuitem on', thisElt);
+    var topTierUl = thisElt.closest('ul[id=topTierUl]');
+    if (thisElt[0].hasAttribute('aria-hidden')) {
+      return;
+    }
+    if (thisElt[0].getAttribute('disabled') === 'disabled') {
+      return;
+    }
+    //var hiddenP = (thisElt[0].getAttribute('aria-expanded') === 'false');
+    //hiddenP always false?
+    var thisTopMenuitem = thisElt.closest('li.topTier');
+    //console.log('thisTopMenuitem=', thisTopMenuitem);
+    var t1 = thisTopMenuitem[0];
+    var submenuOpen = (thisElt[0].getAttribute('aria-expanded') === 'true');
+    if (!submenuOpen) {
+      //console.log('hiddenp true branch');
+      hideAllTopMenuitems();
+      thisTopMenuitem.children('ul.submenu').attr('aria-hidden', 'false').show();
+      thisTopMenuitem.children().first().find('[aria-expanded]').attr('aria-expanded', 'true');
+    } else {
+      //console.log('hiddenp false branch');
+      thisTopMenuitem.children('ul.submenu').attr('aria-hidden', 'true').hide();
+      thisTopMenuitem.children().first().find('[aria-expanded]').attr('aria-expanded', 'false');
+    }
+    e.stopPropagation();
+  }
+
+  var expandableElts = $(document).find('#header [aria-expanded]');
+  expandableElts.click(clickTopMenuitem);
+
+  function hideAllTopMenuitems() {
+    //console.log('doing hideAllTopMenuitems');
+    var topTierUl = $(document).find('#header ul[id=topTierUl]');
+    topTierUl.find('[aria-expanded]').attr('aria-expanded', 'false');
+    topTierUl.find('ul.submenu').attr('aria-hidden', 'true').hide();
+  }
+
+  var nonexpandableElts = $(document).find('#header .topTier > div > button:not([aria-expanded])');
+  nonexpandableElts.click(hideAllTopMenuitems);
+
+  function switchTopMenuitem(destTopMenuitem, destElt) {
+    //console.log('doing switchTopMenuitem', destTopMenuitem, destElt);
+    //console.log('dtmil=', destTopMenuitem.length);
+    hideAllTopMenuitems();
+    if (destTopMenuitem && destTopMenuitem.length !== 0) {
+      var elt = destTopMenuitem[0];
+      var eltId = elt.getAttribute('id');
+      destTopMenuitem.children('ul.submenu').attr('aria-hidden', 'false').show();
+      destTopMenuitem.children().first().find('[aria-expanded]').attr('aria-expanded', 'true');
+    }
+    if (destElt) {
+      //destElt.attr('tabIndex', '0').focus();
+      destElt.focus();
+    }
+  }
+
+  var showingHelpKeys = false;
+
+  function showHelpKeys() {
+    showingHelpKeys = true;
+    $('#help-keys').fadeIn(100);
+    reciteHelp();
+  }
+
+  focusableElts.keydown(function (e) {
+    //console.log('focusable elt keydown', e);
+    var kc = e.keyCode;
+    //$(this).blur(); // Delete?
+    var withinSecondTierUl = true;
+    var topTierUl = $(this).closest('ul[id=topTierUl]');
+    var secondTierUl = $(this).closest('ul.submenu');
+    if (secondTierUl.length === 0) {
+      withinSecondTierUl = false;
+    }
+    if (kc === 27) {
+      //console.log('escape pressed i')
+      $('#help-keys').fadeOut(500);
+    }
+    if (kc === 27 && withinSecondTierUl) { // escape
+      var destTopMenuitem = $(this).closest('li.topTier');
+      var possElts = destTopMenuitem.find('.focusable:not([disabled])').filter(':visible');
+      switchTopMenuitem(destTopMenuitem, possElts.first());
+      e.stopPropagation();
+    } else if (kc === 39) { // rightarrow
+      //console.log('rightarrow pressed');
+      var srcTopMenuitem = $(this).closest('li.topTier');
+      //console.log('srcTopMenuitem=', srcTopMenuitem);
+      srcTopMenuitem.children().first().find('.focusable').attr('tabIndex', '-1');
+      var topTierMenuitems = getTopTierMenuitems();
+      //console.log('ttmi* =', topTierMenuitems);
+      var ttmiN = topTierMenuitems.length;
+      var j = topTierMenuitems.indexOf(srcTopMenuitem[0]);
+      //console.log('j initial=', j);
+      for (var i = (j + 1) % ttmiN; i !== j; i = (i + 1) % ttmiN) {
+        var destTopMenuitem = $(topTierMenuitems[i]);
+        //console.log('destTopMenuitem(a)=', destTopMenuitem);
+        var possElts = destTopMenuitem.find('.focusable:not([disabled])').filter(':visible');
+        //console.log('possElts=', possElts)
+        if (possElts.length > 0) {
+          //console.log('final i=', i);
+          //console.log('landing on', possElts.first());
+          switchTopMenuitem(destTopMenuitem, possElts.first());
+          e.stopPropagation();
+          break;
+        }
+      }
+    } else if (kc === 37) { // leftarrow
+      //console.log('leftarrow pressed');
+      var srcTopMenuitem = $(this).closest('li.topTier');
+      //console.log('srcTopMenuitem=', srcTopMenuitem);
+      srcTopMenuitem.children().first().find('.focusable').attr('tabIndex', '-1');
+      var topTierMenuitems = getTopTierMenuitems();
+      //console.log('ttmi* =', topTierMenuitems);
+      var ttmiN = topTierMenuitems.length;
+      var j = topTierMenuitems.indexOf(srcTopMenuitem[0]);
+      //console.log('j initial=', j);
+      for (var i = (j + ttmiN - 1) % ttmiN; i !== j; i = (i + ttmiN - 1) % ttmiN) {
+        var destTopMenuitem = $(topTierMenuitems[i]);
+        //console.log('destTopMenuitem(b)=', destTopMenuitem);
+        //console.log('i=', i)
+        var possElts = destTopMenuitem.find('.focusable:not([disabled])').filter(':visible');
+        //console.log('possElts=', possElts)
+        if (possElts.length > 0) {
+          //console.log('final i=', i);
+          //console.log('landing on', possElts.first());
+          switchTopMenuitem(destTopMenuitem, possElts.first());
+          e.stopPropagation();
+          break;
+        }
+      }
+    } else if (kc === 38) { // uparrow
+      //console.log('uparrow pressed');
+      var submenu;
+      if (withinSecondTierUl) {
+        var nearSibs = $(this).closest('div').find('.focusable').filter(':visible');
+        //console.log('nearSibs=', nearSibs);
+        var myId = $(this)[0].getAttribute('id');
+        //console.log('myId=', myId);
+        submenu = $([]);
+        var thisEncountered = false;
+        for (var i = nearSibs.length - 1; i >= 0; i--) {
+          if (thisEncountered) {
+            //console.log('adding', nearSibs[i]);
+            submenu = submenu.add($(nearSibs[i]));
+          } else if (nearSibs[i].getAttribute('id') === myId) {
+            thisEncountered = true;
+          }
+        }
+        //console.log('submenu so far=', submenu);
+        var farSibs = $(this).closest('li').prevAll().find('div:not(.disabled)')
+          .find('.focusable').filter(':visible');
+        submenu = submenu.add(farSibs);
+        if (submenu.length === 0) {
+          submenu = $(this).closest('li').closest('ul').find('div:not(.disabled)')
+          .find('.focusable').filter(':visible').last();
+        }
+        if (submenu.length > 0) {
+          submenu.last().focus();
+        } else {
+          /*
+          //console.log('no actionable submenu found')
+          var topmenuItem = $(this).closest('ul.submenu').closest('li')
+          .children().first().find('.focusable:not([disabled])').filter(':visible');
+          if (topmenuItem.length > 0) {
+            topmenuItem.first().focus();
+          } else {
+            //console.log('no actionable topmenuitem found either')
+          }
+          */
+        }
+      }
+      e.stopPropagation();
+    } else if (kc === 40) { // downarrow
+      //console.log('downarrow pressed');
+      var submenuDivs;
+      var submenu;
+      if (!withinSecondTierUl) {
+        //console.log('1st tier')
+        submenuDivs = $(this).closest('li').children('ul').find('div:not(.disabled)');
+        submenu = submenuDivs.find('.focusable').filter(':visible');
+        insertAriaPos(submenu);
+      } else {
+        //console.log('2nd tier')
+        var nearSibs = $(this).closest('div').find('.focusable').filter(':visible');
+        //console.log('nearSibs=', nearSibs);
+        var myId = $(this)[0].getAttribute('id');
+        //console.log('myId=', myId);
+        submenu = $([]);
+        var thisEncountered = false;
+        for (var i = 0; i < nearSibs.length; i++) {
+          if (thisEncountered) {
+            //console.log('adding', nearSibs[i]);
+            submenu = submenu.add($(nearSibs[i]));
+          } else if (nearSibs[i].getAttribute('id') === myId) {
+            thisEncountered = true;
+          }
+        }
+        //console.log('submenu so far=', submenu);
+        var farSibs = $(this).closest('li').nextAll().find('div:not(.disabled)')
+          .find('.focusable').filter(':visible');
+        submenu = submenu.add(farSibs);
+        if (submenu.length === 0) {
+          submenu = $(this).closest('li').closest('ul').find('div:not(.disabled)')
+            .find('.focusable').filter(':visible');
+        }
+      }
+      //console.log('submenu=', submenu)
+      if (submenu.length > 0) {
+        submenu.first().focus();
+      } else {
+        //console.log('no actionable submenu found')
+      }
+      e.stopPropagation();
+    } else if (kc === 27) {
+      //console.log('esc pressed');
+      hideAllTopMenuitems();
+      if (showingHelpKeys) {
+        showingHelpKeys = false;
+      } else {
+        //console.log('calling cycleFocus ii')
+        CPO.cycleFocus();
+      }
+      e.stopPropagation();
+      e.preventDefault();
+      //$(this).closest('nav').closest('main').focus();
+    } else if (kc === 9 ) {
+      if (e.shiftKey) {
+        hideAllTopMenuitems();
+        CPO.cycleFocus(true);
+      }
+      e.stopPropagation();
+      e.preventDefault();
+    } else if (kc === 13 || kc === 17 || kc === 20 || kc === 32) {
+      // 13=enter 17=ctrl 20=capslock 32=space
+      //console.log('stopprop 1')
+      e.stopPropagation();
+    } else if (kc >= 112 && kc <= 123) {
+      //console.log('doprop 1')
+      // fn keys
+      // go ahead, propagate
+    } else if (e.ctrlKey && kc === 191) {
+      //console.log('C-? pressed')
+      showHelpKeys();
+      e.stopPropagation();
+    } else {
+      //console.log('stopprop 2')
+      e.stopPropagation();
+    }
+    //e.stopPropagation();
+  });
+
+  // shareAPI.makeHoverMenu($("#filemenu"), $("#filemenuContents"), false, function(){});
+  // shareAPI.makeHoverMenu($("#bonniemenu"), $("#bonniemenuContents"), false, function(){});
+
 
   var codeContainer = $("<div>").addClass("replMain");
+  codeContainer.attr("role", "region").
+    attr("aria-label", "Definitions");
+    //attr("tabIndex", "-1");
   $("#main").prepend(codeContainer);
 
   CPO.editor = CPO.makeEditor(codeContainer, {
@@ -562,7 +1170,7 @@ $(function() {
     var rulers = CPO.editor.cm.getOption("rulers");
     var longLines = CPO.editor.cm.getOption("longLines");
     var minLength;
-    if (longLines.size == 0) {
+    if (longLines.size === 0) {
       minLength = 0; // if there are no long lines, then we don't care about showing any rulers
     } else {
       minLength = Number.MAX_VALUE;
@@ -711,5 +1319,8 @@ $(function() {
   CPO.updateName = updateName;
   CPO.showShareContainer = showShareContainer;
   CPO.loadProgram = loadProgram;
+  CPO.cycleFocus = cycleFocus;
+  CPO.say = say;
+  CPO.sayAndForget = sayAndForget;
 
 });

@@ -94,6 +94,9 @@ build/web/js/google-apis/%.js: src/web/js/google-apis/%.js
 build/web/js/beforePyret.js: src/web/js/beforePyret.js
 	`npm bin`/webpack
 
+build/web/js/local-files.js: src/web/js/local-files.js
+	cp $< $@
+
 build/web/js/q.js: node_modules/q/q.js
 	cp $< $@
 
