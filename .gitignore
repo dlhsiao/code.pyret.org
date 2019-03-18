@@ -14,3 +14,4 @@ test-util/failed-test-screenshots/*
 .coverage/
 build_electron
 build_web
+release-builds
