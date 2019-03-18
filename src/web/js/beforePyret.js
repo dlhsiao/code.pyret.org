@@ -542,7 +542,8 @@ $(function() {
   }
 
   function enableFileOptions() {
-    $("#filemenuContents *").removeClass("disabled");
+    console.log("File options should be enable");
+    $("#fileMenuContents *").removeClass("disabled");
   }
 
   function menuItemDisabled(id) {
