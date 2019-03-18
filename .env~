@@ -9,7 +9,8 @@ REDISCLOUD_URL=""
 USE_STANDALONE_PYRET=true
 PYRET_RELEASE_BASE="/js"
 CURRENT_PYRET_RELEASE=""
-PYRET="./js/cpo-main.jarr"
+PYRET_APP="../js/cpo-main.jarr"
+PYRET_WEB="http://localhost:5000/js/cpo-main.jarr"
 PORT=5000
 NODE_ENV=development
 OK_GOOGLE_IDS="{\"0B32bNEogmncO\":\"joe.politz@gmail.com\"}"
@@ -21,4 +22,3 @@ FIREBASE_AUTH_DOMAIN=""
 FIREBASE_DB_URL=""
 FIREBASE_BUCKET=""
 FIREBASE_SENDER_ID=""
-
