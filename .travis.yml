@@ -45,12 +45,13 @@ script:
 addons:
   chrome: stable
   artifacts: true
+    working_dir: release_builds
 before_install:
 - . $HOME/.nvm/nvm.sh
 - nvm install stable
 - nvm use stable
 - if [[ `npm -v` != 5.2* ]]; then npm i -g npm@5.2; fi
-#- npm config set python python2.7
+- npm config set python python2.7
 - npm install -g heroku-cli
 - npm install -g chromedriver
 - export CHROME_BIN=chromium-browser
@@ -65,20 +66,20 @@ before_deploy:
 install:
 - npm install --ignore-scripts
 - npm update # to update Pyret to the newest version
-#- make app-local
-#- if [["$TRAVIS_OS_NAME" == "osx"]]; then npm run package-mac; fi
-#- if [["$TRAVIS_OS_NAME" == "osx"]]; then npm run create-installer-dmg; fi
-#- if [["$TRAVIS_OS_NAME" == "linux"]]; then npm run package-linux; fi
-#- if [["$TRAVIS_OS_NAME" == "linux"]]; then npm run create-debian-installer; fi
-#- if [["$TRAVIS_OS_NAME" == "windows"]]; then npm run package-win; fi
-#- if [["$TRAVIS_OS_NAME" == "windows"]]; then npm run create-installer-win; fi
+- make app-local
+- if [["$TRAVIS_OS_NAME" == "osx"]]; then npm run package-mac; fi
+- if [["$TRAVIS_OS_NAME" == "osx"]]; then npm run create-installer-dmg; fi
+- if [["$TRAVIS_OS_NAME" == "linux"]]; then npm run package-linux; fi
+- if [["$TRAVIS_OS_NAME" == "linux"]]; then npm run create-debian-installer; fi
+- if [["$TRAVIS_OS_NAME" == "windows"]]; then npm run package-win; fi
+- if [["$TRAVIS_OS_NAME" == "windows"]]; then npm run create-installer-win; fi
 - make web
 - make deploy-cpo-main
 deploy:
   - provider: s3
     access_key_id: AKIAIFY44WM3LGA4OQSQ
-    secret_access_key:
-      secure: X50U/xTxW1OOBL5rQ6k764xAitKS77+NZfzAGgOKbk/0REUJEg3BHCYCqhr6/AtThh42HKBNNuG029Xu/0wQYOJq9JNWms61g25/1ig6HbeeaJbbpRLdRDWp59UAeB8tUQmPgI34DxREe2zcJJpNErepbkQ0XXx2tULF3HWBLD7PPOv4Ylb78bfhteIGKNX8+Ipag0gCGmJiTr9OPp6FCQh7kWzG1DBfT8t6gZJM9rhvE1y0Myv1OmcT2zs5ZCvd/uJWz7iiGjs4VvOJVTTFYs733B1NX3Inv3vlbgNny46JT7vT5M0RMgulb8ypkkzLham43yuQyn3eIGKVLd3AcTUtdNTB1TP4be50wT/FAoj195Ec1JAsO9LCKz79JPbUvoxdh9C+k+H0B0SHbL+VXqIhZGWLYq0GE/LZfBESYKAeNq/WfoNtfFXIv1VO0rgbX2FU/jxoM7uROagDhfeLBdmYhQVj3O4rXpcUDHcebBEycXlmC5zOaqmANZ37Pc3QIoR1is2+hkNzeP1/NV4huYOmJFlrD7dADKXIsh6vSyp6uZ49tabMfqSe9oKbl41Yc+uHEBm2vPXUF9vmm0SLOZScjFNyvd04EOXxTCBCww+qlFeIeHTyw9NgEIsOgUWUX44ZNZJATLnxCE9EZ+Sp5MHGDH7Wz5ceR5tZh68P7kw=
+    #secret_access_key:
+    #  secure: X50U/xTxW1OOBL5rQ6k764xAitKS77+NZfzAGgOKbk/0REUJEg3BHCYCqhr6/AtThh42HKBNNuG029Xu/0wQYOJq9JNWms61g25/1ig6HbeeaJbbpRLdRDWp59UAeB8tUQmPgI34DxREe2zcJJpNErepbkQ0XXx2tULF3HWBLD7PPOv4Ylb78bfhteIGKNX8+Ipag0gCGmJiTr9OPp6FCQh7kWzG1DBfT8t6gZJM9rhvE1y0Myv1OmcT2zs5ZCvd/uJWz7iiGjs4VvOJVTTFYs733B1NX3Inv3vlbgNny46JT7vT5M0RMgulb8ypkkzLham43yuQyn3eIGKVLd3AcTUtdNTB1TP4be50wT/FAoj195Ec1JAsO9LCKz79JPbUvoxdh9C+k+H0B0SHbL+VXqIhZGWLYq0GE/LZfBESYKAeNq/WfoNtfFXIv1VO0rgbX2FU/jxoM7uROagDhfeLBdmYhQVj3O4rXpcUDHcebBEycXlmC5zOaqmANZ37Pc3QIoR1is2+hkNzeP1/NV4huYOmJFlrD7dADKXIsh6vSyp6uZ49tabMfqSe9oKbl41Yc+uHEBm2vPXUF9vmm0SLOZScjFNyvd04EOXxTCBCww+qlFeIeHTyw9NgEIsOgUWUX44ZNZJATLnxCE9EZ+Sp5MHGDH7Wz5ceR5tZh68P7kw=
     bucket: 'pyret-horizon'
     local-dir: build/web/js
     upload-dir: new-horizons
@@ -88,19 +89,18 @@ deploy:
     on:
       repo: brownplt/code.pyret.org
       branch: horizon
-  # - provider: s3
-  #   access_key_id: AKIAJAKREM7OPVKWGEGQ
-  #   secret_access_key:
-  #     secure: X50U/xTxW1OOBL5rQ6k764xAitKS77+NZfzAGgOKbk/0REUJEg3BHCYCqhr6/AtThh42HKBNNuG029Xu/0wQYOJq9JNWms61g25/1ig6HbeeaJbbpRLdRDWp59UAeB8tUQmPgI34DxREe2zcJJpNErepbkQ0XXx2tULF3HWBLD7PPOv4Ylb78bfhteIGKNX8+Ipag0gCGmJiTr9OPp6FCQh7kWzG1DBfT8t6gZJM9rhvE1y0Myv1OmcT2zs5ZCvd/uJWz7iiGjs4VvOJVTTFYs733B1NX3Inv3vlbgNny46JT7vT5M0RMgulb8ypkkzLham43yuQyn3eIGKVLd3AcTUtdNTB1TP4be50wT/FAoj195Ec1JAsO9LCKz79JPbUvoxdh9C+k+H0B0SHbL+VXqIhZGWLYq0GE/LZfBESYKAeNq/WfoNtfFXIv1VO0rgbX2FU/jxoM7uROagDhfeLBdmYhQVj3O4rXpcUDHcebBEycXlmC5zOaqmANZ37Pc3QIoR1is2+hkNzeP1/NV4huYOmJFlrD7dADKXIsh6vSyp6uZ49tabMfqSe9oKbl41Yc+uHEBm2vPXUF9vmm0SLOZScjFNyvd04EOXxTCBCww+qlFeIeHTyw9NgEIsOgUWUX44ZNZJATLnxCE9EZ+Sp5MHGDH7Wz5ceR5tZh68P7kw=
-  #   bucket: 'pyret-installers'
-  #   local-dir: release-builds
-  #   upload-dir: installers
-  #   acl: public_read
-  #   skip_cleanup: true
-  #   detect_encoding: true
-  #   on:
-  #     repo: dlhsiao/code.pyret.org
-  #     branch: Dana/Bryan-Installation
+  - provider: s3
+    access_key_id: AKIAJAKREM7OPVKWGEGQ
+    secret_access_key:
+    bucket: 'pyret-installers'
+    local-dir: release-builds
+    upload-dir: installers
+    acl: public_read
+    skip_cleanup: true
+    detect_encoding: true
+    on:
+      repo: dlhsiao/code.pyret.org
+      branch: Dana/Bryan-Installation
   - provider: heroku
     app: pyret-horizon
     api_key:
