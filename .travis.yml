@@ -17,8 +17,10 @@ env:
   - BASE_URL=http://localhost:5000
   - SESSION_SECRET=not-so-secret-for-testing
   - USE_STANDALONE_PYRET=true
-  - PYRET="http://localhost:5000/js/cpo-main.jarr"
+  - PYRET="../js/cpo-main.jarr"
+  #- PYRET="http://localhost:5000/js/cpo-main.jarr"
   - CURRENT_PYRET_RELEASE=""
+  - MODE="../"
   - PORT=5000
   - SAUCE_TEST_TARGET="http://localhost:5000"
   - SAUCE_USERNAME="pyret-lang"
@@ -72,7 +74,7 @@ install:
 - if [["$TRAVIS_OS_NAME" == "linux"]]; then npm run create-debian-installer; fi
 - if [["$TRAVIS_OS_NAME" == "windows"]]; then npm run package-win; fi
 - if [["$TRAVIS_OS_NAME" == "windows"]]; then npm run create-installer-win; fi
-- make web
+#- make web
 - make deploy-cpo-main
 deploy:
   - provider: s3
