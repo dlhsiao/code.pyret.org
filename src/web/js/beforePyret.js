@@ -254,36 +254,61 @@ $(function() {
     $("#connectButton").attr("disabled", "disabled");
     $('#connectButtonli').attr('disabled', 'disabled');
     $("#connectButton").attr("tabIndex", "-1");
+
+    var OAuth2Provider = window.require("electron-oauth-helper");
+    var BrowserWindow = require('electron')
+
+    var authWindow = new BrowserWindow({
+      width: 600,
+      height: 800,
+      webPreferences: {
+        nodeIntegration: false, // We recommend disabling nodeIntegration for security.
+        contextIsolation: true, // We recommend enabling contextIsolation for security.
+        // see https://github.com/electron/electron/blob/master/docs/tutorial/security.md
+      },
+    })
+
+    var config = { /* oauth config. please see example/main/config.example.js.  */}
+    var provider = new OAuth2Provider(config)
+    // Your can use custom parameter.
+    // const provider = new OAuth2Provider(config)
+    //   .withCustomAuthorizationRequestParameter({})
+    //   .withCustomAccessTokenRequestParameter({})
+    provider.perform(authWindow)
+      .then(resp => {
+        console.log(resp)
+      })
+      .catch(error => console.error(error))
     //$("#topTierUl").attr("tabIndex", "0");
-    getTopTierMenuitems();
-    storageAPI = createProgramCollectionAPI("code.pyret.org", false);
-    storageAPI.then(function(api) {
-      api.collection.then(function() {
-        $(".loginOnly").show();
-        $(".logoutOnly").hide();
-        document.activeElement.blur();
-        $("#bonniemenubutton").focus();
-        setUsername($("#username"));
-        if(params["get"] && params["get"]["program"]) {
-          var toLoad = api.api.getFileById(params["get"]["program"]);
-          console.log("Logged in and has program to load: ", toLoad);
-          loadProgram(toLoad);
-          programToSave = toLoad;
-        } else {
-          programToSave = Q.fcall(function() { return null; });
-        }
-      });
-      api.collection.fail(function() {
-        $("#connectButton").text("Connect to Google Drive");
-        $("#connectButton").attr("disabled", false);
-        $('#connectButtonli').attr('disabled', false);
-        //$("#connectButton").attr("tabIndex", "0");
-        document.activeElement.blur();
-        $("#connectButton").focus();
-        //$("#topTierUl").attr("tabIndex", "-1");
-      });
-    });
-    storageAPI = storageAPI.then(function(api) { return api.api; });
+    // getTopTierMenuitems();
+    // storageAPI = createProgramCollectionAPI("code.pyret.org", false);
+    // storageAPI.then(function(api) {
+    //   api.collection.then(function() {
+    //     $(".loginOnly").show();
+    //     $(".logoutOnly").hide();
+    //     document.activeElement.blur();
+    //     $("#bonniemenubutton").focus();
+    //     setUsername($("#username"));
+    //     if(params["get"] && params["get"]["program"]) {
+    //       var toLoad = api.api.getFileById(params["get"]["program"]);
+    //       console.log("Logged in and has program to load: ", toLoad);
+    //       loadProgram(toLoad);
+    //       programToSave = toLoad;
+    //     } else {
+    //       programToSave = Q.fcall(function() { return null; });
+    //     }
+    //   });
+    //   api.collection.fail(function() {
+    //     $("#connectButton").text("Connect to Google Drive");
+    //     $("#connectButton").attr("disabled", false);
+    //     $('#connectButtonli').attr('disabled', false);
+    //     //$("#connectButton").attr("tabIndex", "0");
+    //     document.activeElement.blur();
+    //     $("#connectButton").focus();
+    //     //$("#topTierUl").attr("tabIndex", "-1");
+    //   });
+    // });
+    // storageAPI = storageAPI.then(function(api) { return api.api; });
   });
 
   /*
@@ -405,7 +430,6 @@ $(function() {
     nextIndex = ((nextIndex % maxIndex) + maxIndex) % maxIndex;
     return nextIndex;
   }
-
   function populateFocusCarousel(editor) {
     if (!editor.focusCarousel) {
       editor.focusCarousel = [];

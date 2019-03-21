@@ -17,6 +17,9 @@ module.exports = {
     "js/dashboard/index": './src/web/js/dashboard/index.js',
     "js/beforePyret": './src/web/js/beforePyret.js',
   },
+  node: {
+      fs: 'empty',
+  },
   module: {
     loaders: [
       {test: /\.css$/, loaders: ["style", "css"]},
