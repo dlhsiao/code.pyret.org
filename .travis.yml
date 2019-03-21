@@ -1,11 +1,11 @@
-language: ruby
+language: javascript
 os:
   - linux
   - osx
   - windows
 sudo: required
-rvm:
-  - 2.2
+javascript:
+  - "stable"
 env:
   global:
   - TEST_LOC="sauce"
