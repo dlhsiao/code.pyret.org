@@ -13,4 +13,5 @@ pyret
 test-util/failed-test-screenshots/*
 .coverage/
 build_web
-release-builds
+release-builds/*
+!release-builds/.gitkeep
