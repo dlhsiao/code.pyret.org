@@ -46,9 +46,9 @@ addons:
   chrome: stable
   artifacts:
     paths:
-      $release_builds/*.dmg
-      $release_builds/*.deb
-      $release_builds/*.exe
+    - $HOME/release_builds/*.dmg
+    - $HOME/release_builds/*.deb
+    - $HOME/release_builds/*.exe
 before_install:
 - . $HOME/.nvm/nvm.sh
 - nvm install stable
