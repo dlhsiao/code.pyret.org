@@ -1,5 +1,5 @@
 {
-  "dest": "release-builds/",
+  "dest": "release_builds/",
   "icon": "assets/icons/png/1024x1024.png",
   "categories": [
     "Education"
