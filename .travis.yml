@@ -56,7 +56,8 @@ before_install:
 - if [[ `npm -v` != 5.2* ]]; then npm i -g npm@5.2; fi
 - npm config set python python2.7
 #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm install -g appdmg --python=python2.7
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then apt-get install fakeroot; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install fakeroot; fi
 # - npm install -g heroku-cli
 # - npm install -g chromedriver
 # - export CHROME_BIN=chromium-browser
