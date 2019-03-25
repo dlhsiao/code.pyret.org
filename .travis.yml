@@ -69,9 +69,6 @@ before_deploy:
 install:
 - npm install --ignore-scripts
 - npm update # to update Pyret to the newest version
-# - make web
-# - make deploy-cpo-main
-after_script:
 - ln -s node_modules/pyret-lang pyret
 - make app-local
 - if ["$TRAVIS_OS_NAME" == "osx"]; then electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/pyretLogo.icns --prune=true --out=release_builds; fi
@@ -80,6 +77,10 @@ after_script:
 - if ["$TRAVIS_OS_NAME" == "linux"]; then electron-installer-debian --src ./release_builds/code.pyret.org-linux-x64/ --arch amd64 --config debian.json; fi
 - if ["$TRAVIS_OS_NAME" == "windows"]; then electron-packager . PyretApp --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/pyretLogo.ico --prune=true --out=release_builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"PyretApp\"; fi
 - if ["$TRAVIS_OS_NAME" == "windows"]; then electron-installer-windows --src ./release_builds/PyretApp-win32-x64/ --dest ./release_builds --overwrite; fi
+# - make web
+# - make deploy-cpo-main
+after_script:
+
 deploy:
 # - provider: s3
 #   access_key_id: AKIAIFY44WM3LGA4OQSQ
