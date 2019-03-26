@@ -1,7 +1,7 @@
 language: node_js
 os:
-- linux
-#- osx
+#- linux
+- osx
 #- windows
 sudo: required
 node_js:
@@ -46,8 +46,8 @@ addons:
   chrome: stable
   artifacts:
     paths:
-    #- $./release_builds/PyretApp.dmg
-    - $./release_builds/code.pyret.org_0.0.0_amd64.deb
+    - $./release_builds/PyretApp.dmg
+    #- $./release_builds/code.pyret.org_0.0.0_amd64.deb
     #- $./release_builds/*.exe
 before_install:
 - . $HOME/.nvm/nvm.sh
@@ -55,9 +55,9 @@ before_install:
 - nvm use stable
 - if [[ `npm -v` != 5.2* ]]; then npm i -g npm@5.2; fi
 - npm config set python python2.7
-#- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm install -g appdmg --python=python2.7
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install fakeroot; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm install -g appdmg --python=python2.7
+#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
+#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install fakeroot; fi
 # - npm install -g heroku-cli
 # - npm install -g chromedriver
 # - export CHROME_BIN=chromium-browser
@@ -74,10 +74,10 @@ install:
 - npm update # to update Pyret to the newest version
 - ln -s node_modules/pyret-lang pyret
 - make app-local
-#- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/pyretLogo.icns --prune=true --out=release_builds; fi
-#- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then electron-installer-dmg ./release_builds/PyretApp-darwin-x64/PyretApp.app PyretApp --out=release_builds --overwrite --icon=assets/icons/mac/pyretLogo.icns --background=assets/background.png; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-packager . code.pyret.org --overwrite --asar --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release_builds; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-installer-debian --src ./release_builds/code.pyret.org-linux-x64/ --arch amd64 --config debian.json; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/pyretLogo.icns --prune=true --out=release_builds; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then electron-installer-dmg ./release_builds/PyretApp-darwin-x64/PyretApp.app PyretApp --out=release_builds --overwrite --icon=assets/icons/mac/pyretLogo.icns --background=assets/background.png; fi
+#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-packager . code.pyret.org --overwrite --asar --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release_builds; fi
+#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-installer-debian --src ./release_builds/code.pyret.org-linux-x64/ --arch amd64 --config debian.json; fi
 #- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then electron-packager . PyretApp --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/pyretLogo.ico --prune=true --out=release_builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"PyretApp\"; fi
 #- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then electron-installer-windows --src ./release_builds/PyretApp-win32-x64/ --dest ./release_builds --overwrite; fi
 # - make web
