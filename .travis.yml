@@ -53,7 +53,8 @@ before_install:
 # - . $HOME/.nvm/nvm.sh
 # - nvm install stable
 # - nvm use stable
-- if [[ `npm -v` != 5.2* ]]; then sudo npm i -g npm@5.2; fi
+- if [[ "$TRAVIS_OS_NAME" == "windows" && `npm -v` != 5.2* ]]; then runas /user:Administrator "npm -i -g npm@5.2"; fi
+- if [[ `npm -v` != 5.2* ]]; then npm i -g npm@5.2; fi
 - npm config set python python2.7
 #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
 #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install fakeroot; fi
