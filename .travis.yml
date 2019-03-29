@@ -1,8 +1,8 @@
 language: node_js
 os:
-#- linux
+- linux
 #- osx
-- windows
+#- windows
 sudo: required
 node_js:
   - "6"
@@ -10,12 +10,12 @@ env:
   global:
   - TEST_LOC="sauce"
   - GOOGLE_CLIENT_ID=""
-  #- GOOGLE_CLIENT_SECRET=""
+  - GOOGLE_CLIENT_SECRET=""
   - GOOGLE_CHROME_BINARY=/usr/bin/google-chrome-stable
-  #- secure: TYqxrQOzkzQcyfDfLz9fOklDjK+vkXg0Jzp8wTynenz8ZzLIac6UKH3DZza7KcQAdgNhhSYoekh05z+b2/EaYKvo+SNDDsfWEP2qjBCL6GxccDE8Ti6itt4orGZUT2XKd6FkDbXDq9j3lUfKlG78lIImGiZKL1UN2WnQozXxBpdp1C8c4V2UcXo70u26Ii/m9eTYGoQfUvVa57lqpA7dMsuVW6lffTmGAcL0pY9penE6+tv1B7pxzQ7wrl+eQh4qw423qCJCWHRKKHVtPqvSafh6E8/wJIc5OUXRvy1Uz6eM4oX6PWfs0Knrznh1fLtFaJSXzSEaDNzJesoInvDINsQ8HqM9dYv95Codbg0wh9QlW3ZFg8OL8gAG2i9dScGRMqtTjz+cRpIDP1ppDaWypMrvLCoRVV/WfufQQTqZeESAFvOU4fcihlwAGaadEa2D4SVY72GXxIuxox2fKjNtxfCggoZhUZJQUWUP/C7x/W1qbu2XrgxGYB0VpCUcpFAH7Zsl2P96WBfIvjHvxITTCEA86lyV6ZcdX/fhCVEPGabBz5Et5hHbH1jFV3T3qDJpMLmeLbhZSHVsUrnnsb0qkEGX3jgHF6WaCDgwiEAzmGS4/JKsW5MlZvAdd2gd+EEowqMCA9gXRyR8RZr2OyxrKs73U7GyH/lgpHeZURf6YAY=
+  - secure: TYqxrQOzkzQcyfDfLz9fOklDjK+vkXg0Jzp8wTynenz8ZzLIac6UKH3DZza7KcQAdgNhhSYoekh05z+b2/EaYKvo+SNDDsfWEP2qjBCL6GxccDE8Ti6itt4orGZUT2XKd6FkDbXDq9j3lUfKlG78lIImGiZKL1UN2WnQozXxBpdp1C8c4V2UcXo70u26Ii/m9eTYGoQfUvVa57lqpA7dMsuVW6lffTmGAcL0pY9penE6+tv1B7pxzQ7wrl+eQh4qw423qCJCWHRKKHVtPqvSafh6E8/wJIc5OUXRvy1Uz6eM4oX6PWfs0Knrznh1fLtFaJSXzSEaDNzJesoInvDINsQ8HqM9dYv95Codbg0wh9QlW3ZFg8OL8gAG2i9dScGRMqtTjz+cRpIDP1ppDaWypMrvLCoRVV/WfufQQTqZeESAFvOU4fcihlwAGaadEa2D4SVY72GXxIuxox2fKjNtxfCggoZhUZJQUWUP/C7x/W1qbu2XrgxGYB0VpCUcpFAH7Zsl2P96WBfIvjHvxITTCEA86lyV6ZcdX/fhCVEPGabBz5Et5hHbH1jFV3T3qDJpMLmeLbhZSHVsUrnnsb0qkEGX3jgHF6WaCDgwiEAzmGS4/JKsW5MlZvAdd2gd+EEowqMCA9gXRyR8RZr2OyxrKs73U7GyH/lgpHeZURf6YAY=
   - REDISCLOUD_URL=""
   - BASE_URL=http://localhost:5000
-  # SESSION_SECRET=not-so-secret-for-testing
+  - SESSION_SECRET=not-so-secret-for-testing
   - USE_STANDALONE_PYRET=true
   - PYRET_WEB="http://localhost:5000/js/cpo-main.jarr"
   - PYRET_APP="../js/cpo-main.jarr"
@@ -23,10 +23,10 @@ env:
   - PORT=5000
   - SAUCE_TEST_TARGET="http://localhost:5000"
   - SAUCE_USERNAME="pyret-lang"
-  #- secure: e0vpQGmW0d69Ql72Mw6gsGsMxAKgt61ZNqsfQEtNlAGtx7CbTKe3xg8kF1ygwFVEB7GDmTaojTcSGbRwqqZ5GAa8dsTAkefhOtfCDV5KUjvXXbpo9J/8YLiZiIy7ksHyh1yhByvvWmZZpjmdxWwcH8gUqtpae3bGtz7rQX3jLf2v3OR5uVFt8vKRMSR9imCWmq6tpnu+GVoaCFOHjq3U7LS1h78R2LJz+MnTuCbDtYFlxp/sAyS7vSXssFScl6wqOsgH5PHlj+kaHhFWLhzsAzG1RoHftqqIeinXzDcYo8EC/c6O3hMf2KtHm/Hsh1dPR8GnE6WClxPw0xNbh10jVf7b1CXuzKGF8a1JlmtsVztiujsMswZGGLpTkqBvBAiuDsMOwKFNk7UrR5FA/0bVMMsluKxW/0UBzVPN9QyMKAs19ca1t/qT3abxYFyvXrDibKMLuS1uCCsZbwTkjkPwfWBzin8ohK2gLi+y24eQFSd27XWcmk+fJHfgJ458OgvczubK0CsyPAaJtCvRBYKvLQaEtkc4RkoM0yx6NhYYLCZqH1DRneam40rVSrVO41yT/PUnA5U64q16ptbn90Vgw/yKlp9OLtWKheBDTinwbst1kegbCSj4qZtORFLIQIUsZQN6SUm9tCACqFosDpRXAzURc2IOdsSUmtJEqvkijsc=
-  #- secure: "E19TyEFE1iQSRrZI4w6ahWgFGEFZBiUgxn/Pqq5sQwHlMNpai+bVydDRVlcQ0NsrdPmyXY/4+29wMjsAHbSaiBuqgG5PbtpChJK7a+8583G6CrbkWdZgwkMDpqPQ2IBEWVYeybvl36wuXJ4HNCqImPODWvX1Wxzk5RCK/gM4PNu3OdmQm3+6O8y1N6r0Y/lnqeAxhaZ5wv01/6EE3I3rAbnFxnu0wIJ7AfNV64VRk+tqwYuM5fLXrl6yhelSwp9q5CLEwvvYknBkklHAXbvxc2qo8XfZb6Zb701NyGvFW86Acgo1dytqV+BNmxNj4FfnXj+rxi/SDpiKEifzj5UYLIAgAx/qbxWSHD8SHiOL1WMa7N3vN2Dh+O+9vCLDwtpzbC0kJqxVMei8buAR4pLReZO0OsmHGXDPApoqOdxvQ0Z2VtEWojIWaJSIl0gTaWKAPAE6GMT0zRQcmm6GPXmLpWGc/9MZKJ5lTXQloucRaStRhPYV4x2HNF4vVZmJ0RWQexAX4qsUiaVFs0jdnJTDvgyPWj+f7qJaaqNFfXz9TyP2N8LSjPdGBYfkWIbkv8dXjJCufXX29BbOD5Yq1NcRQxgTnQO1cvXs1/MJOrK8tCAQ/rZUqQakBMg71fhznOm2lejiiingfnq846C1v27KxZzFLnGIOfDUbMAgS1sbGUU="
+  - secure: e0vpQGmW0d69Ql72Mw6gsGsMxAKgt61ZNqsfQEtNlAGtx7CbTKe3xg8kF1ygwFVEB7GDmTaojTcSGbRwqqZ5GAa8dsTAkefhOtfCDV5KUjvXXbpo9J/8YLiZiIy7ksHyh1yhByvvWmZZpjmdxWwcH8gUqtpae3bGtz7rQX3jLf2v3OR5uVFt8vKRMSR9imCWmq6tpnu+GVoaCFOHjq3U7LS1h78R2LJz+MnTuCbDtYFlxp/sAyS7vSXssFScl6wqOsgH5PHlj+kaHhFWLhzsAzG1RoHftqqIeinXzDcYo8EC/c6O3hMf2KtHm/Hsh1dPR8GnE6WClxPw0xNbh10jVf7b1CXuzKGF8a1JlmtsVztiujsMswZGGLpTkqBvBAiuDsMOwKFNk7UrR5FA/0bVMMsluKxW/0UBzVPN9QyMKAs19ca1t/qT3abxYFyvXrDibKMLuS1uCCsZbwTkjkPwfWBzin8ohK2gLi+y24eQFSd27XWcmk+fJHfgJ458OgvczubK0CsyPAaJtCvRBYKvLQaEtkc4RkoM0yx6NhYYLCZqH1DRneam40rVSrVO41yT/PUnA5U64q16ptbn90Vgw/yKlp9OLtWKheBDTinwbst1kegbCSj4qZtORFLIQIUsZQN6SUm9tCACqFosDpRXAzURc2IOdsSUmtJEqvkijsc=
+  - secure: "E19TyEFE1iQSRrZI4w6ahWgFGEFZBiUgxn/Pqq5sQwHlMNpai+bVydDRVlcQ0NsrdPmyXY/4+29wMjsAHbSaiBuqgG5PbtpChJK7a+8583G6CrbkWdZgwkMDpqPQ2IBEWVYeybvl36wuXJ4HNCqImPODWvX1Wxzk5RCK/gM4PNu3OdmQm3+6O8y1N6r0Y/lnqeAxhaZ5wv01/6EE3I3rAbnFxnu0wIJ7AfNV64VRk+tqwYuM5fLXrl6yhelSwp9q5CLEwvvYknBkklHAXbvxc2qo8XfZb6Zb701NyGvFW86Acgo1dytqV+BNmxNj4FfnXj+rxi/SDpiKEifzj5UYLIAgAx/qbxWSHD8SHiOL1WMa7N3vN2Dh+O+9vCLDwtpzbC0kJqxVMei8buAR4pLReZO0OsmHGXDPApoqOdxvQ0Z2VtEWojIWaJSIl0gTaWKAPAE6GMT0zRQcmm6GPXmLpWGc/9MZKJ5lTXQloucRaStRhPYV4x2HNF4vVZmJ0RWQexAX4qsUiaVFs0jdnJTDvgyPWj+f7qJaaqNFfXz9TyP2N8LSjPdGBYfkWIbkv8dXjJCufXX29BbOD5Yq1NcRQxgTnQO1cvXs1/MJOrK8tCAQ/rZUqQakBMg71fhznOm2lejiiingfnq846C1v27KxZzFLnGIOfDUbMAgS1sbGUU="
   - ARTIFACTS_KEY=AKIAJAKREM7OPVKWGEGQ
-  #- secure: iUO9237WOsnH6sF6crxXdUSttf5LnE5zelISrK6MWVy2oeedNM15eTOm99+oL1J+ffz/b9Y+J0P7hW76TD1lp2TvvY6+r0Lp2ouYEE2uZs+LiehKffUfC02r779y9J9zt30N3BOS3HWyM9R3HrHvjIAXrTGwovmKGuEjatHB5XylPQ8m2Z6gsQPJ5PMuzURboHdC7ZNS8HeCTjKouerfqqGyoWRUnjt0nj4J7BcMRBapKWjirFQQ0KZhJjkT/CZNR6bl6GgtUACB14Mm1fAOXNADQz45wmd1xcVm7LMjcXRpIMDwBMiYLgeU9tIakG+Q1o9RwQ/SQKbUzjdn6jo2W/EzriRvokXfOVsLKfTGWDSLJx1DOxnuyX1Yilu/+zJ5KPC4n2u9Eq7WmmArM3Av0uaOQ7/XL19NtZQxT5knrLjFuFgOfI83klhO8Qx+V709y6ZitDxDFHMbhf2iPc0U5U4ihkSKnlgChDfoNmIfftatxqvevZDQv5ByyeL5gPCP39aZMAY1cvHgBHxjPxo6adddnmTCB/mBc3/SDxfDE/RJJztH8EOPxJHZbr1/ebJRmgtCbPk7fL/3D99zicYTjf6uENGqIXedOwBMvQqnIf4J2qoxFwYpUpyh5Sa5cpNY6mQv2VMkUFQKtt0IPvIymoyeqZglw7+/MKZtin7QRUU=
+  - secure: iUO9237WOsnH6sF6crxXdUSttf5LnE5zelISrK6MWVy2oeedNM15eTOm99+oL1J+ffz/b9Y+J0P7hW76TD1lp2TvvY6+r0Lp2ouYEE2uZs+LiehKffUfC02r779y9J9zt30N3BOS3HWyM9R3HrHvjIAXrTGwovmKGuEjatHB5XylPQ8m2Z6gsQPJ5PMuzURboHdC7ZNS8HeCTjKouerfqqGyoWRUnjt0nj4J7BcMRBapKWjirFQQ0KZhJjkT/CZNR6bl6GgtUACB14Mm1fAOXNADQz45wmd1xcVm7LMjcXRpIMDwBMiYLgeU9tIakG+Q1o9RwQ/SQKbUzjdn6jo2W/EzriRvokXfOVsLKfTGWDSLJx1DOxnuyX1Yilu/+zJ5KPC4n2u9Eq7WmmArM3Av0uaOQ7/XL19NtZQxT5knrLjFuFgOfI83klhO8Qx+V709y6ZitDxDFHMbhf2iPc0U5U4ihkSKnlgChDfoNmIfftatxqvevZDQv5ByyeL5gPCP39aZMAY1cvHgBHxjPxo6adddnmTCB/mBc3/SDxfDE/RJJztH8EOPxJHZbr1/ebJRmgtCbPk7fL/3D99zicYTjf6uENGqIXedOwBMvQqnIf4J2qoxFwYpUpyh5Sa5cpNY6mQv2VMkUFQKtt0IPvIymoyeqZglw7+/MKZtin7QRUU=
   - ARTIFACTS_BUCKET=pyret-installers
   matrix:
   - SAUCE_BROWSER="chrome"
@@ -47,17 +47,17 @@ addons:
   artifacts:
     paths:
     #- $./release_builds/PyretApp.dmg
-    #- $./release_builds/code.pyret.org_0.0.0_amd64.deb
-    - $./release_builds/PyretApp-0.0.1-setup.exe
+    - $./release_builds/code.pyret.org_0.0.0_amd64.deb
+    #- $./release_builds/PyretApp-0.0.1-setup.exe
 before_install:
-# - . $HOME/.nvm/nvm.sh
-# - nvm install stable
-# - nvm use stable
-- if [[ "$TRAVIS_OS_NAME" == "windows" && `npm -v` != 5.2* ]]; then runas /user:Administrator "npm -i -g npm@5.2"; fi
+- . $HOME/.nvm/nvm.sh
+- nvm install stable
+- nvm use stable
+#- if [[ "$TRAVIS_OS_NAME" == "windows" && `npm -v` != 5.2* ]]; then runas /user:Administrator "npm -i -g npm@5.2"; fi
 - if [[ `npm -v` != 5.2* ]]; then npm i -g npm@5.2; fi
 - npm config set python python2.7
-#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
-#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install fakeroot; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install fakeroot; fi
 # - npm install -g heroku-cli
 # - npm install -g chromedriver
 # - export CHROME_BIN=chromium-browser
@@ -77,10 +77,10 @@ install:
 - make app-local
 #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/pyretLogo.icns --prune=true --out=release_builds; fi
 #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then electron-installer-dmg ./release_builds/PyretApp-darwin-x64/PyretApp.app PyretApp --out=release_builds --overwrite --icon=assets/icons/mac/pyretLogo.icns --background=assets/background.png; fi
-#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-packager . code.pyret.org --overwrite --asar --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release_builds; fi
-#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-installer-debian --src ./release_builds/code.pyret.org-linux-x64/ --arch amd64 --config debian.json; fi
-- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then electron-packager . PyretApp --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/pyretLogo.ico --prune=true --out=release_builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"PyretApp\"; fi
-- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then electron-installer-windows --src ./release_builds/PyretApp-win32-x64/ --dest ./release_builds --overwrite; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-packager . code.pyret.org --overwrite --asar --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release_builds; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-installer-debian --src ./release_builds/code.pyret.org-linux-x64/ --arch amd64 --config debian.json; fi
+#- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then electron-packager . PyretApp --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/pyretLogo.ico --prune=true --out=release_builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"PyretApp\"; fi
+#- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then electron-installer-windows --src ./release_builds/PyretApp-win32-x64/ --dest ./release_builds --overwrite; fi
 # - make web
 # - make deploy-cpo-main
 after_script:
