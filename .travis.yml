@@ -59,7 +59,7 @@ before_install:
 - npm config set python python2.7
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install fakeroot; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt install wine64; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install --install-recommends winehq-stable; fi
 # - npm install -g heroku-cli
 # - npm install -g chromedriver
 # - export CHROME_BIN=chromium-browser
