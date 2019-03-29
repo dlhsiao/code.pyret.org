@@ -34,9 +34,10 @@ cache:
   directories:
   - node_modules
 before_script:
-# - node src/run.js &
-# - sleep 3
+ - node src/run.js &
+ - sleep 3
 script:
+- heroku local:run node_modules/.bin/mocha --grep modules --invert
 # - sleep 3
 # - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then heroku local:run node_modules/.bin/mocha;
 #   fi
@@ -79,8 +80,8 @@ install:
 #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then electron-installer-dmg ./release_builds/PyretApp-darwin-x64/PyretApp.app PyretApp --out=release_builds --overwrite --icon=assets/icons/mac/pyretLogo.icns --background=assets/background.png; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-packager . code.pyret.org --overwrite --asar --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release_builds; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-installer-debian --src ./release_builds/code.pyret.org-linux-x64/ --arch amd64 --config debian.json; fi
-#- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then electron-packager . PyretApp --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/pyretLogo.ico --prune=true --out=release_builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"PyretApp\"; fi
-#- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then electron-installer-windows --src ./release_builds/PyretApp-win32-x64/ --dest ./release_builds --overwrite; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-packager . PyretApp --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/pyretLogo.ico --prune=true --out=release_builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"PyretApp\"; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-installer-windows --src ./release_builds/PyretApp-win32-x64/ --dest ./release_builds --overwrite; fi
 # - make web
 # - make deploy-cpo-main
 after_script:
