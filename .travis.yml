@@ -59,6 +59,10 @@ before_install:
 - npm config set python python2.7
 #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
 #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install fakeroot; fi
+#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo dpkg --add-architecture i386; fi
+#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget -nc https://dl.winehq.org/wine-builds/Release.key; fi
+#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-key add Release.key; fi
+#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-add-repository https://dl.winehq.org/wine-builds/ubuntu/; fi
 #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install --install-recommends winehq-stable; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install wine; fi
@@ -84,7 +88,7 @@ install:
 #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-packager . code.pyret.org --overwrite --asar --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release_builds; fi
 #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-installer-debian --src ./release_builds/code.pyret.org-linux-x64/ --arch amd64 --config debian.json; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then electron-packager . PyretApp --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/pyretLogo.ico --prune=true --out=release_builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"PyretApp\"; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then electron-installer-windows --src ./release_builds/PyretApp-win32-x64/ --dest ./release_builds --overwrite; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then electron-installer-windows --src ./release_builds/PyretApp-win32-ia32/ --dest ./release_builds --overwrite; fi
 # - make web
 # - make deploy-cpo-main
 after_script:
