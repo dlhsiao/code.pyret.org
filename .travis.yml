@@ -66,6 +66,7 @@ before_install:
 #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install --install-recommends winehq-stable; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install wine; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install mono; fi
 # - npm install -g heroku-cli
 # - npm install -g chromedriver
 # - export CHROME_BIN=chromium-browser
