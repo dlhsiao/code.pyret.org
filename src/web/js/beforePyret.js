@@ -1,5 +1,10 @@
 /* global $ jQuery CPO CodeMirror storageAPI Q createProgramCollectionAPI makeShareAPI */
 
+// var main =  require('../../../main.js')
+
+require('babel-polyfill');
+
+
 var shareAPI = makeShareAPI(process.env.CURRENT_PYRET_RELEASE);
 
 var url = require('url.js');
@@ -12,6 +17,7 @@ window.ct_log = function(/* varargs */) {
     console.log.apply(console, arguments);
   }
 };
+
 
 window.ct_error = function(/* varargs */) {
   if (window.console && LOG) {
@@ -248,6 +254,91 @@ $(function() {
     });
   });
 
+  const { remote } = window.require('electron');
+
+  function signInWithPopup () {
+    console.log("signInWithPopup")
+    return new Promise((resolve, reject) => {
+      const authWindow = new remote.BrowserWindow({
+        width: 500,
+        height: 600,
+        show: true,
+      })
+
+      // TODO: Generate and validate PKCE code_challenge value
+      const urlParams = {
+        response_type: 'code',
+        //URI could be something locally, something on localhost. We'll have to decide
+        //either a file localhost url or code.pyret.org url
+        redirect_uri: GOOGLE_REDIRECT_URI,
+        client_id: GOOGLE_CLIENT_ID,
+        scope: 'profile email',
+      }
+      const authUrl = `${GOOGLE_AUTHORIZATION_URL}?${qs.stringify(urlParams)}`
+
+      function handleNavigation (url) {
+        const query = parse(url, true).query
+          if (query) {
+            if (query.error) {
+              reject(new Error(`There was an error: ${query.error}`))
+            } else if (query.code) {
+              // Login is complete
+              authWindow.removeAllListeners('closed')
+              setImmediate(() => authWindow.close())
+
+              // This is the authorization code we need to request tokens
+              resolve(query.code)
+            }
+          }
+
+      }
+
+      authWindow.on('closed', () => {
+        // TODO: Handle this smoothly
+        throw new Error('Auth window was closed by user')
+      })
+
+      authWindow.webContents.on('will-navigate', (event, url) => {
+        handleNavigation(url)
+      })
+
+      authWindow.webContents.on('did-get-redirect-request', (event, oldUrl, newUrl) => {
+        handleNavigation(newUrl)
+      })
+
+      authWindow.loadURL(authUrl)
+    })
+  }
+
+
+  async function googleSignIn() {
+    const code = await signInWithPopup()
+    const tokens = await fetchAccessTokens(code)
+    const {id, email, name} = await fetchGoogleProfile(tokens.access_token)
+    const providerUser = {
+      uid: id,
+      email,
+      displayName: name,
+      idToken: tokens.id_token,
+    }
+    console.log("googleSignIn")
+    return mySignInFunction(providerUser)
+  }
+
+  async function fetchAccessTokens(code) {
+    const response = await axios.post(GOOGLE_TOKEN_URL, qs.stringify({
+      code,
+      client_id: GOOGLE_CLIENT_ID,
+      redirect_uri: GOOGLE_REDIRECT_URI,
+      grant_type: 'authorization_code',
+    }), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    })
+    return response.data
+  }
+
   storageAPI = storageAPI.then(function(api) { return api.api; });
   $("#connectButton").click(function() {
     $("#connectButton").text("Connecting...");
@@ -255,30 +346,32 @@ $(function() {
     $('#connectButtonli').attr('disabled', 'disabled');
     $("#connectButton").attr("tabIndex", "-1");
 
-    var OAuth2Provider = window.require("electron-oauth-helper");
-    var BrowserWindow = require('electron')
+    googleSignIn();
 
-    var authWindow = new BrowserWindow({
-      width: 600,
-      height: 800,
-      webPreferences: {
-        nodeIntegration: false, // We recommend disabling nodeIntegration for security.
-        contextIsolation: true, // We recommend enabling contextIsolation for security.
-        // see https://github.com/electron/electron/blob/master/docs/tutorial/security.md
-      },
-    })
+    // var OAuth2Provider = window.require("electron-oauth-helper");
+    // var BrowserWindow = require('electron')
+    //
+    // var authWindow = new BrowserWindow({
+    //   width: 600,
+    //   height: 800,
+    //   webPreferences: {
+    //     nodeIntegration: false, // We recommend disabling nodeIntegration for security.
+    //     contextIsolation: true, // We recommend enabling contextIsolation for security.
+    //     // see https://github.com/electron/electron/blob/master/docs/tutorial/security.md
+    //   },
+    // })
 
     var config = { /* oauth config. please see example/main/config.example.js.  */}
-    var provider = new OAuth2Provider(config)
+    // var provider = new OAuth2Provider(config)
     // Your can use custom parameter.
     // const provider = new OAuth2Provider(config)
     //   .withCustomAuthorizationRequestParameter({})
     //   .withCustomAccessTokenRequestParameter({})
-    provider.perform(authWindow)
-      .then(resp => {
-        console.log(resp)
-      })
-      .catch(error => console.error(error))
+    // provider.perform(authWindow)
+    //   .then(resp => {
+    //     console.log(resp)
+    //   })
+    //   .catch(error => console.error(error))
     //$("#topTierUl").attr("tabIndex", "0");
     // getTopTierMenuitems();
     // storageAPI = createProgramCollectionAPI("code.pyret.org", false);

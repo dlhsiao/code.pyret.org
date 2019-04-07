@@ -26,7 +26,10 @@ function start(config, onServerReady) {
     var login = Q.defer();
     var session = req.session;
     function redirect() {
-      res.redirect("/login?redirect=" + encodeURIComponent(req.originalUrl));
+      console.log(req)
+      console.log("YOOO")
+      console.log(res)
+      res.redirect("https://code.pyret.org/login");
     }
     if(!session || !session["user_id"]) {
       redirect();
@@ -123,7 +126,11 @@ function start(config, onServerReady) {
   });
 
   app.get("/login", function(req, res) {
-    var redirect = req.param("redirect") || "/editor";
+    console.log("in app get")
+    console.log(req)
+    const path = require('path');
+    var newRedirect = path.join(__dirname, '/editor.html');
+    var redirect = req.param("redirect") || newRedirect;
     if(!(req.session && req.session["user_id"])) {
       res.redirect(auth.getAuthUrl(redirect));
     }
