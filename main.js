@@ -93,7 +93,7 @@ app.on('activate', () => {
 //         height: 600,
 //         show: true,
 //       })
-// 
+//
 //       // TODO: Generate and validate PKCE code_challenge value
 //       const urlParams = {
 //         response_type: 'code',
@@ -102,7 +102,7 @@ app.on('activate', () => {
 //         scope: 'profile email',
 //       }
 //       const authUrl = `${GOOGLE_AUTHORIZATION_URL}?${qs.stringify(urlParams)}`
-// 
+//
 //       function handleNavigation (url) {
 //         const query = parse(url, true).query
 //           if (query) {
@@ -112,31 +112,31 @@ app.on('activate', () => {
 //               // Login is complete
 //               authWindow.removeAllListeners('closed')
 //               setImmediate(() => authWindow.close())
-// 
+//
 //               // This is the authorization code we need to request tokens
 //               resolve(query.code)
 //             }
 //           }
-// 
+//
 //       }
-// 
+//
 //       authWindow.on('closed', () => {
 //         // TODO: Handle this smoothly
 //         throw new Error('Auth window was closed by user')
 //       })
-// 
+//
 //       authWindow.webContents.on('will-navigate', (event, url) => {
 //         handleNavigation(url)
 //       })
-// 
+//
 //       authWindow.webContents.on('did-get-redirect-request', (event, oldUrl, newUrl) => {
 //         handleNavigation(newUrl)
 //       })
-// 
+//
 //       authWindow.loadURL(authUrl)
 //     })
 //   },
-// 
+//
 //   googleSignIn: async function() {
 //     const code = await signInWithPopup()
 //     const tokens = await fetchAccessTokens(code)
@@ -147,7 +147,7 @@ app.on('activate', () => {
 //       displayName: name,
 //       idToken: tokens.id_token,
 //     }
-// 
+//
 //     return mySignInFunction(providerUser)
 //   },
 //   fetchAccessTokens: async function (code) {
@@ -163,5 +163,5 @@ app.on('activate', () => {
 //     })
 //     return response.data
 //   },
-// 
+//
 // };

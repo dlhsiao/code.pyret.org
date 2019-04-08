@@ -53,7 +53,7 @@
     "mustache-express": "^1.2.1",
     "node-static": "^0.7.3",
     "node-uuid": "^1.4.1",
-    "parse": "^2.2.1",
+    "parse": "^2.3.2",
     "pyret-codemirror-mode": "git://github.com/brownplt/pyret-codemirror-mode.git#master",
     "pyret-ide": "git://github.com/pcardune/pyret-ide.git#master",
     "pyret-lang": "git://github.com/brownplt/pyret-lang.git#horizon",
@@ -74,6 +74,7 @@
     "supervisor": "^0.11.0",
     "url-loader": "^0.6.2",
     "url.js": "^1.0.2",
+    "uuid": "^3.3.2",
     "webpack": "^1.13.1",
     "webpack-dev-server": "^1.14.1"
   },

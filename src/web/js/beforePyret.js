@@ -3,6 +3,12 @@
 // var main =  require('../../../main.js')
 
 require('babel-polyfill');
+const {remote} = window.require('electron');
+const url2 = window.require('url')
+// const parse = window.require('url')
+const axios = window.require('axios');
+const qs = window.require('qs');
+
 
 
 var shareAPI = makeShareAPI(process.env.CURRENT_PYRET_RELEASE);
@@ -111,6 +117,7 @@ function checkVersion() {
   });
 }
 window.setInterval(checkVersion, VERSION_CHECK_INTERVAL);
+
 
 window.CPO = {
   save: function() {},
@@ -270,19 +277,21 @@ $(function() {
         response_type: 'code',
         //URI could be something locally, something on localhost. We'll have to decide
         //either a file localhost url or code.pyret.org url
-        redirect_uri: GOOGLE_REDIRECT_URI,
-        client_id: GOOGLE_CLIENT_ID,
+        redirect_uri: 'http://localhost:5000/oauth2callback',
+        client_id: '1025941403504-9jn95a8o6mm941psijqrev22ccma9n0i.apps.googleusercontent.com',
         scope: 'profile email',
       }
-      const authUrl = `${GOOGLE_AUTHORIZATION_URL}?${qs.stringify(urlParams)}`
+      const authUrl = `${'https://accounts.google.com/o/oauth2/v2/auth'}?${qs.stringify(urlParams)}`
 
       function handleNavigation (url) {
-        const query = parse(url, true).query
+        const query = url2.parse(url, true).query
           if (query) {
             if (query.error) {
               reject(new Error(`There was an error: ${query.error}`))
             } else if (query.code) {
               // Login is complete
+              console.log("login complete")
+              console.log(query.code)
               authWindow.removeAllListeners('closed')
               setImmediate(() => authWindow.close())
 
@@ -326,16 +335,19 @@ $(function() {
   }
 
   async function fetchAccessTokens(code) {
-    const response = await axios.post(GOOGLE_TOKEN_URL, qs.stringify({
+    const response = await axios.post('https://www.googleapis.com/oauth2/v4/token', qs.stringify({
       code,
-      client_id: GOOGLE_CLIENT_ID,
-      redirect_uri: GOOGLE_REDIRECT_URI,
+      redirect_uri: 'http://localhost:5000/oauth2callback',
+      client_id: '1025941403504-9jn95a8o6mm941psijqrev22ccma9n0i.apps.googleusercontent.com',
       grant_type: 'authorization_code',
     }), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     })
+    console.log("in fetch")
+    console.log(response)
+    console.log(response.data)
     return response.data
   }
 
