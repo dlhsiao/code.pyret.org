@@ -17,6 +17,7 @@ module.exports = {
     "js/dashboard/index": './src/web/js/dashboard/index.js',
     "js/beforePyret": './src/web/js/beforePyret.js',
   },
+  externals: ['axios'],
   node: {
       fs: 'empty',
   },
