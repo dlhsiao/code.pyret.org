@@ -350,6 +350,16 @@ $(function() {
     console.log(response.data)
     return response.data
   }
+  
+  async function fetchGoogleProfile (accessToken) {
+    const response = await axios.get('https://www.googleapis.com/userinfo/v2/me', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    })
+    return response.data
+  }
 
   storageAPI = storageAPI.then(function(api) { return api.api; });
   $("#connectButton").click(function() {
