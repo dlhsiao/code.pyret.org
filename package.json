@@ -86,10 +86,10 @@
     "start-web": "heroku local:run supervisor --poll-interval 700 --watch src/run.js,src/server.js src/run.js & heroku local:run webpack-dev-server --port 5001 --watch",
     "start-app": "electron ./main.js",
     "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/pyretLogo.icns --prune=true --out=release_builds",
-    "package-win": "electron-packager . PyretApp --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/pyretLogo.ico --prune=true --out=release_builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"PyretApp\"",
+    "package-win": "electron-packager . code.pyret.org --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/pyretLogo.ico --prune=true --out=release_builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"PyretApp\"",
     "package-linux": "electron-packager . code.pyret.org --overwrite --asar --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release_builds",
     "create-installer-mac": "electron-installer-dmg ./release_builds/PyretApp-darwin-x64/PyretApp.app PyretApp --out=release_builds --overwrite --icon=assets/icons/mac/pyretLogo.icns --background=assets/background.png",
-    "create-installer-win": "electron-installer-windows --src ./release_builds/PyretApp-win32-x64/ --dest ./release_builds --overwrite",
+    "create-installer-win": "electron-installer-windows --src ./release_builds/PyretApp-win32-ia32/ --dest release_builds --overwrite",
     "create-debian-installer": "electron-installer-debian --src ./release_builds/code.pyret.org-linux-x64/ --arch amd64 --config debian.json"
   },
   "repository": {
