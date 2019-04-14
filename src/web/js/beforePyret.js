@@ -279,7 +279,7 @@ $(function() {
         //either a file localhost url or code.pyret.org url
         redirect_uri: 'http://localhost:5000/oauth2callback',
         client_id: '1025941403504-9jn95a8o6mm941psijqrev22ccma9n0i.apps.googleusercontent.com',
-        scope: 'profile email',
+        scope: 'email https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.install https://www.googleapis.com/auth/drive.photos.readonly https://www.googleapis.com/auth/photos',
       }
       const authUrl = `${'https://accounts.google.com/o/oauth2/v2/auth'}?${qs.stringify(urlParams)}`
 
@@ -292,6 +292,8 @@ $(function() {
               // Login is complete
               console.log("login complete")
               console.log(query.code)
+              console.log(query)
+              console.log(query.googleId)
               authWindow.removeAllListeners('closed')
               setImmediate(() => authWindow.close())
 
@@ -331,7 +333,8 @@ $(function() {
       idToken: tokens.id_token,
     }
     console.log("googleSignIn")
-    return mySignInFunction(providerUser)
+    console.log(providerUser)
+    // return mySignInFunction(providerUser)
   }
 
   async function fetchAccessTokens(code) {
@@ -350,7 +353,7 @@ $(function() {
     console.log(response.data)
     return response.data
   }
-  
+
   async function fetchGoogleProfile (accessToken) {
     const response = await axios.get('https://www.googleapis.com/userinfo/v2/me', {
       headers: {
