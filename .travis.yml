@@ -90,7 +90,7 @@ install:
 #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-installer-debian --src ./release_builds/code.pyret.org-linux-x64/ --arch amd64 --config debian.json; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run package-win; fi
 - ls release_builds
-- ls release_builds/Pyret-win32-x64
+- ls release_builds/Pyret-win32-ia32
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run create-package-win; fi
 # - make web
 # - make deploy-cpo-main
