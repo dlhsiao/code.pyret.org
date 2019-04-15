@@ -91,7 +91,7 @@ install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run package-win; fi
 - ls release_builds
 - ls release_builds/Pyret-win32-ia32
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run create-package-win; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run create-installer-win; fi
 # - make web
 # - make deploy-cpo-main
 after_script:
