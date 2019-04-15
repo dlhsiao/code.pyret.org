@@ -1,8 +1,5 @@
 {
-  "options.productName": "Pyret",
+  "productName": "Pyret",
   "dest": "./release_builds/",
-  "icon": "assets/icons/win/pyretLogo.ico",
-  "tags": [
-    "Education"
-  ],
+  "icon": "assets/icons/win/pyretLogo.ico"
 }
