@@ -2,6 +2,7 @@
   "dest": "release_builds/",
   "icon": "assets/icons/win/pyretLogo.ico",
   "options": {
-    "productName": "Pyret"
+    "productName": "Pyret",
+    "exe": "Pyret.exe"
   }
 }
