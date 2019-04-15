@@ -1,6 +1,6 @@
 {
   "name": "code.pyret.org",
-  "productName": "PyretApp",
+  "productName": "Pyret",
   "version": "0.0.0",
   "description": "A simple IDE for Pyret",
   "main": "main.js",
