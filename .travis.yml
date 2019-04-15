@@ -89,10 +89,8 @@ install:
 #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-packager . code.pyret.org --overwrite --asar --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release_builds; fi
 #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-installer-debian --src ./release_builds/code.pyret.org-linux-x64/ --arch amd64 --config debian.json; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run package-win; fi
-- ls release_builds
-- ls release_builds/Pyret-win32-ia32
-- electron-installer-windows --help
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run create-installer-win; fi
+- ls release_builds
 # - make web
 # - make deploy-cpo-main
 after_script:
