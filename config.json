@@ -1,5 +1,7 @@
 {
-  "productName": "Pyret",
-  "dest": "./release_builds/",
-  "icon": "assets/icons/win/pyretLogo.ico"
+  "dest": "release_builds/",
+  "icon": "assets/icons/win/pyretLogo.ico",
+  "options": {
+    "productName": "Pyret"
+  }
 }
