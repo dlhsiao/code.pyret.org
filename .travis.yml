@@ -47,27 +47,21 @@ addons:
   chrome: stable
   artifacts:
     paths:
-    - $./release_builds/Pyret.dmg
-    #- $./release_builds/code.pyret.org_0.0.0_amd64.deb
-    - $./release_builds/pyret-0.0.0-setup.exe
-    - $./release_builds/pyret-0.0.0-full.nupkg
+    #- $./release_builds/Pyret.dmg
+    - $./release_builds/pyret_0.0.0_amd64.deb
+    #- $./release_builds/pyret-0.0.0-setup.exe
+    #- $./release_builds/pyret-0.0.0-full.nupkg
 before_install:
 - . $HOME/.nvm/nvm.sh
 - nvm install stable
 - nvm use stable
-#- if [[ "$TRAVIS_OS_NAME" == "windows" && `npm -v` != 5.2* ]]; then runas /user:Administrator "npm -i -g npm@5.2"; fi
 - if [[ `npm -v` != 5.2* ]]; then npm i -g npm@5.2; fi
 - npm config set python python2.7
-#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
-#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install fakeroot; fi
-#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo dpkg --add-architecture i386; fi
-#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget -nc https://dl.winehq.org/wine-builds/Release.key; fi
-#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-key add Release.key; fi
-#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-add-repository https://dl.winehq.org/wine-builds/ubuntu/; fi
-#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install --install-recommends winehq-stable; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install wine; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install mono; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install fakeroot; fi
+# - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"; fi
+# - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install wine; fi
+# - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install mono; fi
 # - npm install -g heroku-cli
 # - npm install -g chromedriver
 # - export CHROME_BIN=chromium-browser
@@ -82,15 +76,15 @@ before_deploy:
 install:
 - npm install
 - npm update # to update Pyret to the newest version
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm install -g appdmg --python=python2.7; fi
+# - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm install -g appdmg --python=python2.7; fi
 - ln -s node_modules/pyret-lang pyret
 - make app-local
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/pyretLogo.icns --prune=true --out=release_builds; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then electron-installer-dmg ./release_builds/Pyret-darwin-x64/Pyret.app Pyret --out=release_builds --overwrite --icon=assets/icons/mac/pyretLogo.icns --background=assets/background.png; fi
-#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-packager . code.pyret.org --overwrite --asar --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release_builds; fi
-#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then electron-installer-debian --src ./release_builds/code.pyret.org-linux-x64/ --arch amd64 --config debian.json; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run package-win; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run create-installer-win; fi
+# - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run package-mac; fi
+# - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run create-installer-mac; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm run package-linux; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm run create-installer-debian; fi
+#- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run package-win; fi
+#- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run create-installer-win; fi
 - ls release_builds
 # - make web
 # - make deploy-cpo-main
