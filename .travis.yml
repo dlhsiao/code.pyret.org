@@ -50,6 +50,7 @@ addons:
     - $./release_builds/Pyret.dmg
     #- $./release_builds/code.pyret.org_0.0.0_amd64.deb
     - $./release_builds/pyret-0.0.0-setup.exe
+    - $./release_builds/pyret-0.0.0-full.nupkg
 before_install:
 - . $HOME/.nvm/nvm.sh
 - nvm install stable
