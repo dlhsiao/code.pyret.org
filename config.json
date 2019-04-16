@@ -3,6 +3,7 @@
   "icon": "assets/icons/win/pyretLogo.ico",
   "options": {
     "productName": "Pyret",
-    "exe": "Pyret.exe"
+    "exe": "Pyret.exe",
+    "name": "pyret"
   }
 }
