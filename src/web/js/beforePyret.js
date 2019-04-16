@@ -277,14 +277,16 @@ $(function() {
         response_type: 'code',
         //URI could be something locally, something on localhost. We'll have to decide
         //either a file localhost url or code.pyret.org url
-        redirect_uri: 'http://localhost:5000/oauth2callback',
-        client_id: '1025941403504-9jn95a8o6mm941psijqrev22ccma9n0i.apps.googleusercontent.com',
+        redirect_uri: 'https://pyret-horizon.herokuapp.com/oauth2callback',
+        client_id: '671896643910-rjor8o4a0a8arftp8c2e1cj59etvmpht.apps.googleusercontent.com',
         scope: 'email https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.install https://www.googleapis.com/auth/drive.photos.readonly https://www.googleapis.com/auth/photos',
       }
       const authUrl = `${'https://accounts.google.com/o/oauth2/v2/auth'}?${qs.stringify(urlParams)}`
 
       function handleNavigation (url) {
         const query = url2.parse(url, true).query
+          console.log("query")
+          console.log(query)
           if (query) {
             if (query.error) {
               reject(new Error(`There was an error: ${query.error}`))
@@ -310,10 +312,14 @@ $(function() {
       })
 
       authWindow.webContents.on('will-navigate', (event, url) => {
+        console.log("will navigate")
+        console.log(url)
         handleNavigation(url)
       })
 
       authWindow.webContents.on('did-get-redirect-request', (event, oldUrl, newUrl) => {
+        console.log('did get redirect request')
+        console.log(url)
         handleNavigation(newUrl)
       })
 
@@ -334,16 +340,34 @@ $(function() {
     }
     console.log("googleSignIn")
     console.log(providerUser)
+    function makeWrapped() {
+      this.GoogleAPIError = GoogleAPIError;
+      this.GAPIError = GAPIError;
+      this.AuthenticationError = AuthenticationError;
+      this.APIResponseError = APIResponseError;
+      this.load = loadAPI;
+      // this.withAuth = function(f) {return failCheck(authCheck(f));};
+      // this.request = (function(params, skipAuth) {
+      //   return gQ(function() { return gapi.client.request(params); }, skipAuth);
+      // });
+      this.auth = auth;
+      this.hasAuth = function() { return auth !== null; };
+    }
+
+    makeWrapped.prototype = _GWRAP_APIS;
+
+    gwrap = new makeWrapped();
+    console.log(gwrap)
     // return mySignInFunction(providerUser)
   }
 
   async function fetchAccessTokens(code) {
-    const response = await axios.post('https://www.googleapis.com/oauth2/v4/token', qs.stringify({
-      code,
-      redirect_uri: 'http://localhost:5000/oauth2callback',
-      client_id: '1025941403504-9jn95a8o6mm941psijqrev22ccma9n0i.apps.googleusercontent.com',
-      grant_type: 'authorization_code',
-    }), {
+    const response = await axios.get('https://pyret-horizon.herokuapp.com/getAccessToken', qs.stringify({
+      // code,
+      // redirect_uri: 'https://pyret-horizon.herokuapp.com/oauth2callback',
+      // client_id: '671896643910-rjor8o4a0a8arftp8c2e1cj59etvmpht.apps.googleusercontent.com',
+      // grant_type: 'authorization_code',
+    }), {withCredentials: true}, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
