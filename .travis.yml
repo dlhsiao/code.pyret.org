@@ -34,10 +34,10 @@ cache:
   directories:
   - node_modules
 before_script:
- - node src/run.js &
- - sleep 3
+ #- node src/run.js &
+ #- sleep 3
 script:
-- heroku local:run node_modules/.bin/mocha --grep modules --invert
+#- heroku local:run node_modules/.bin/mocha --grep modules --invert
 # - sleep 3
 # - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then heroku local:run node_modules/.bin/mocha;
 #   fi
