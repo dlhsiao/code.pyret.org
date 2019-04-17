@@ -104,19 +104,6 @@ deploy:
 #   on:
 #     repo: brownplt/code.pyret.org
 #     branch: horizon
-# - provider: s3
-#   access_key_id: AKIAJAKREM7OPVKWGEGQ
-#   secret_access_key:
-#     secure: Z+Indx0izEd0mYPhc9F3fhqFIqwCs7S/gQrPgg6+84+r09QNYl0RMzCrUNzBZGzmWQGAHbjGUTu61otStlVVziVTdBmVugNFciE8XyI5BKuNRJyE1VvuvXzIAUn3XHznEEh0pwb+CNEWe9o3jUIZ/gohSl3Fo7ud+tTj5FAnz3nCQSYPB4W895cw+KR/GhrMSx1Fh4XNhbrDRSCTYmE5IkQsz9NUdDhCYTfTSLu7nSAYAeY6PjddpChOTJzXtOO+L+jdhgwpD5l+1rUefEKg9o4eik3SMQ9sfuBCEh5G+bD5O87Oj+ePtNBj+hGAPZWu0CbtYelBeaHd3o0iuO1UQD1xXQgotmY35PDHuod8Iu/cVBzSh5svqujbnZKTO9bpq0i3DZsQ6mkyjbpp7RoLObCm4o6TXIoqZE+fGnbJ7V02gFFj29c7ah5+MbE/8BNBhe6pTSfBayJX/EYWHKWRnJbBcn7yESDZw7AVhPpX3FnVNiZyuqtxlVFg9LCR/IN4ktjzwou5DB7DOuPozLCC5o79hrn3O1gy6nUhK0tkhc+v6QSvciz38pHDGmjdWU7qGKQ+nSSHPEo2F5FIDi3AlDWFfRr+Xu7/VKAZK+Nzc1yCGcfnq7GHZpzy27YwpKCTPBKW7iIfeD/CuZOkTqALIealJb/EferPRdYXB3pi8xo=
-#   bucket: pyret-installers
-#   local-dir: release_builds
-#   upload-dir: installers
-#   acl: public_read
-#   skip_cleanup: true
-#   detect_encoding: true
-#   on:
-#     repo: dlhsiao/code.pyret.org
-#     branch: Dana/Bryan-Installation
 # - provider: heroku
 #   app: pyret-horizon
 #   api_key:
