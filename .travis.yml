@@ -1,6 +1,6 @@
 language: node_js
 os:
-#- linux
+- linux
 - osx
 #- windows
 sudo: required
@@ -33,6 +33,9 @@ env:
 cache:
   directories:
   - node_modules
+  - $HOME/Library/Caches/Homebrew
+before_cache:
+  -brew cleanup
 before_script:
  #- node src/run.js &
  #- sleep 3
@@ -48,7 +51,7 @@ addons:
   artifacts:
     paths:
     - $./release_builds/Pyret.dmg
-    #- $./release_builds/pyret_0.0.0_amd64.deb
+    - $./release_builds/pyret_0.0.0_amd64.deb
     - $./release_builds/pyret-0.0.0-setup.exe
     - $./release_builds/pyret-0.0.0-full.nupkg
 before_install:
@@ -57,9 +60,9 @@ before_install:
 - nvm use stable
 - if [[ `npm -v` != 5.2* ]]; then npm i -g npm@5.2; fi
 - npm config set python python2.7
-#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
-#- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install fakeroot; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install fakeroot; fi
+#- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install wine; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install mono; fi
 # - npm install -g heroku-cli
@@ -76,13 +79,13 @@ before_deploy:
 install:
 - npm install
 - npm update # to update Pyret to the newest version
-# - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm install -g appdmg --python=python2.7; fi
+ - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm install -g appdmg --python=python2.7; fi
 - ln -s node_modules/pyret-lang pyret
 - make app-local
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run package-mac; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run create-installer-mac; fi
-# - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm run package-linux; fi
-# - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm run create-installer-debian; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm run package-linux; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm run create-installer-debian; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run package-win; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run create-installer-win; fi
 - ls release_builds
