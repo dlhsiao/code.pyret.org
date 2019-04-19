@@ -1,3 +1,5 @@
+if (require('electron-squirrel-startup')) return;
+
 // handle setupEvents as quickly as possible
 const setupEvents = require('./installers/setupEvents')
 if (setupEvents.handleSquirrelEvent()) {

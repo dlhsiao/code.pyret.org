@@ -1,8 +1,7 @@
 {
   "options": {
     "productName": "Pyret",
-    "name": "Pyret",
-    "exe": "Pyret"
+    "bin": "Pyret"
   },
   "dest": "release_builds/",
   "icon": "assets/icons/png/1024x1024.png",
