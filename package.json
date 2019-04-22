@@ -88,7 +88,7 @@
     "start-app": "electron ./main.js",
     "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/pyretLogo.icns --prune=true --out=release_builds",
     "package-win": "electron-packager . Pyret --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/pyretLogo.ico --prune=true --out=release_builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Pyret\"",
-    "package-linux": "electron-packager . Pyret --overwrite --asar --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release_builds =executableName=code.pyret.org",
+    "package-linux": "electron-packager . Pyret --overwrite --asar --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release_builds -executableName=code.pyret.org",
     "create-installer-mac": "electron-installer-dmg ./release_builds/Pyret-darwin-x64/Pyret.app Pyret --out=release_builds --overwrite --icon=assets/icons/mac/pyretLogo.icns --background=assets/background.png",
     "create-installer-win": "electron-installer-windows --src ./release_builds/Pyret-win32-ia32/ --dest ./release_builds --config config.json --overwrite",
     "create-installer-debian": "electron-installer-debian --src ./release_builds/Pyret-linux-x64/ --arch amd64 --config debian.json"
