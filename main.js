@@ -1,3 +1,8 @@
+const { app, BrowserWindow } = require('electron')
+const url = require('url')
+const path = require('path')
+const {ipcMain} = require('electron')
+
 if (require('electron-squirrel-startup')) return;
 
 // handle setupEvents as quickly as possible
@@ -7,11 +12,6 @@ if (setupEvents.handleSquirrelEvent()) {
     return;
   }
 }
-
-const { app, BrowserWindow } = require('electron')
-const url = require('url')
-const path = require('path')
-const {ipcMain} = require('electron')
 
 var BUILD_DIR = "../"
 
