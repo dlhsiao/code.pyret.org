@@ -1,7 +1,5 @@
 {
   "options": {
-    "productName": "Pyret",
-    "bin": "Pyret",
     "name": "pyret"
   },
   "dest": "release_builds/",
