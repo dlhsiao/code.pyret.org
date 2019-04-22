@@ -85,6 +85,7 @@ install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run package-mac; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run create-installer-mac; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm run package-linux; fi
+- ls release_builds/Pyret-linux-x64
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm run create-installer-debian; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run package-win; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run create-installer-win; fi
