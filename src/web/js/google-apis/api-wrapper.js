@@ -27,8 +27,9 @@ var gwrap = window.gwrap = {
           });
       })
       .fail(function(err) {
-        ret.reject(err); 
+        ret.reject(err);
       });
+    console.log(ret.promise)
     return ret.promise;
   },
   request: function() {
@@ -61,7 +62,7 @@ function reauth(immediate) {
     // The user is logged in, but needs an access token from our server
     var newToken = $.ajax("/getAccessToken", { method: "get", datatype: "json" });
     console.log("in here")
-    
+
     newToken.then(function(t) {
       console.log(t)
       gapi.auth.setToken({ access_token: t.access_token });

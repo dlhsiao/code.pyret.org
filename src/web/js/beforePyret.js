@@ -270,6 +270,7 @@ $(function() {
         width: 500,
         height: 600,
         show: true,
+        // webPreferences: { webSecurity: false }
       })
 
       // TODO: Generate and validate PKCE code_challenge value
@@ -362,16 +363,19 @@ $(function() {
   }
 
   async function fetchAccessTokens(code) {
-    const response = await axios.get('https://pyret-horizon.herokuapp.com/getAccessToken', qs.stringify({
-      // code,
-      // redirect_uri: 'https://pyret-horizon.herokuapp.com/oauth2callback',
-      // client_id: '671896643910-rjor8o4a0a8arftp8c2e1cj59etvmpht.apps.googleusercontent.com',
-      // grant_type: 'authorization_code',
-    }), {withCredentials: true}, {
+    console.log("in fetch")
+    const response = await axios.post('https://www.googleapis.com/oauth2/v4/token', qs.stringify({
+      code: code,
+      redirect_uri: 'https://pyret-horizon.herokuapp.com/oauth2callback',
+      client_id: '671896643910-rjor8o4a0a8arftp8c2e1cj59etvmpht.apps.googleusercontent.com',
+      grant_type: 'authorization_code',
+    }), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRF-Token' : CSRF_TOKEN,
       },
-    })
+    }
+  )
     console.log("in fetch")
     console.log(response)
     console.log(response.data)
@@ -379,12 +383,14 @@ $(function() {
   }
 
   async function fetchGoogleProfile (accessToken) {
+    console.log("in fetch google profile")
     const response = await axios.get('https://www.googleapis.com/userinfo/v2/me', {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`,
+        'X-CSRF-Token' : CSRF_TOKEN
       },
-    })
+    }, {withCredentials: true})
     return response.data
   }
 
