@@ -3,14 +3,21 @@ const url = require('url')
 const path = require('path')
 const {ipcMain} = require('electron')
 
-if (require('electron-squirrel-startup')) return;
+const args = require('./args')
+const squirrel = require('./squirrel')
 
-// handle setupEvents as quickly as possible
-const setupEvents = require('./installers/setupEvents')
-if (setupEvents.handleSquirrelEvent()) {
-    // squirrel event handled and app will exit in 1000ms, so don't do anything else
-    return;
+const cmd = args.parseArguments(app, process.argv.slice(1)).squirrelCommand
+if (process.platform === 'win32' && squirrel.handleCommand(app, cmd)) {
+  return
 }
+// if (require('electron-squirrel-startup')) return;
+//
+// // handle setupEvents as quickly as possible
+// const setupEvents = require('./installers/setupEvents')
+// if (setupEvents.handleSquirrelEvent()) {
+//     // squirrel event handled and app will exit in 1000ms, so don't do anything else
+//     return;
+// }
 
 
 var BUILD_DIR = "../"
