@@ -79,7 +79,7 @@ before_deploy:
 install:
 - npm install
 - npm update # to update Pyret to the newest version
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm install -g appdmg --python=python2.7; fi
+#- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm install -g appdmg --python=python2.7; fi
 - ln -s node_modules/pyret-lang pyret
 - make app-local
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run package-mac; fi
