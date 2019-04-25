@@ -5,7 +5,7 @@ os:
 #- windows
 sudo: required
 node_js:
-  - "6"
+  - "10"
 env:
   global:
   - TEST_LOC="sauce"
@@ -58,8 +58,8 @@ before_install:
 - . $HOME/.nvm/nvm.sh
 - nvm install stable
 - nvm use stable
-- if [[ `npm -v` != 5.2* ]]; then npm i -g npm@5.2; fi
-- npm config set python python2.7
+#- if [[ `npm -v` != 5.2* ]]; then npm i -g npm@5.2; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm config set python python2.7; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install fakeroot; fi
 #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"; fi
@@ -79,11 +79,11 @@ before_deploy:
 install:
 - npm install
 - npm update # to update Pyret to the newest version
-#- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm install -g appdmg --python=python2.7; fi
-# - ln -s node_modules/pyret-lang pyret
-# - make app-local
-# - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run package-mac; fi
-# - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run create-installer-mac; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm install -g appdmg --python=python2.7; fi
+- ln -s node_modules/pyret-lang pyret
+- make app-local
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run package-mac; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run create-installer-mac; fi
 # - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm run package-linux; fi
 # - ls release_builds
 # - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm run create-installer-debian; fi
