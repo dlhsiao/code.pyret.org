@@ -5,7 +5,7 @@ os:
 #- windows
 sudo: required
 node_js:
-  - "10"
+  - "11"
 env:
   global:
   - TEST_LOC="sauce"
