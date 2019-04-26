@@ -33,9 +33,9 @@ env:
 cache:
   directories:
   - node_modules
-  #- $HOME/Library/Caches/Homebrew
+  - $HOME/Library/Caches/Homebrew
 before_cache:
-#- brew cleanup
+- brew cleanup
 before_script:
  #- node src/run.js &
  #- sleep 3

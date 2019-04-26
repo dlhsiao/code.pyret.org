@@ -8,7 +8,7 @@ const pkg = require('./package.json')
 const appFolder = path.resolve(process.execPath, '..')
 const rootFolder = path.resolve(appFolder, '..')
 const updateDotExe = path.join(rootFolder, 'Update.exe')
-const exeName = path.basename(process.execPath)
+const exeName = path.resolve(path.dirname(process.execPath),'..',`app-` + appInfo.version,path.basename(process.execPath))//path.basename(process.execPath)
 
 function spawn (command, args, callback) {
   let spawnedProcess = null

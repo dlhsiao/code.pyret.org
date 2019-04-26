@@ -1,10 +1,10 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, Menu, Tray } = require('electron')
 const url = require('url')
 const path = require('path')
 const {ipcMain} = require('electron')
 
-const args = require('./args')
-const squirrel = require('./squirrel')
+const args = require('./installers/args')
+const squirrel = require('./installers/squirrel')
 
 const cmd = args.parseArguments(app, process.argv.slice(1)).squirrelCommand
 if (process.platform === 'win32' && squirrel.handleCommand(app, cmd)) {
@@ -30,7 +30,51 @@ require('electron-handlebars') ({
   GOOGLE_API_KEY: process.env.GOOGLE_API_KEY
 });
 
-let win
+let win = null
+let tray = null
+let quitting = false
+
+function createMenu() {
+  const appMenu = Menu.buildFromTemplate([
+    label: 'File',
+    submenu: [
+      {
+        label: 'Quit',
+        accelerator: 'CmdOrCtrl+Q',
+        click: () => {
+          app.quit()
+        }
+      }
+    ]
+  ])
+  Menu.setApplicationMenu(appMenu)
+}
+
+function createTray = () => {
+  const variant = (process.platform === 'darwin' ? 'Black' : 'White')
+  const iconPath = path.resolve(__dirname, './assets/icons/png/64x64.png')
+
+  tray = new Tray(iconPath)
+
+  const trayMenu = Menu.buildFromTemplate([
+    {
+      label: 'Preferences...',
+      click: () => {
+        win.show()
+      }
+    },
+    {
+      type: 'separator'
+    },
+    {
+      label: 'Quit',
+      click: () => {
+        app.quit()
+      }
+    }
+  ])
+  tray.setContextMenu(trayMenu)
+}
 
 function createWindow() {
   let win = new BrowserWindow({
@@ -45,13 +89,21 @@ function createWindow() {
     slashes: true
   }))
 
-  win.webContents.openDevTools()
+  //win.webContents.openDevTools()
 
   win.on('close', function(e) {
+    if (quitting) {
+      return
+    }
+
     e.preventDefault();
-    win.destroy();
+    win.hide();
   })
 
+  win.on('closed,' () => {
+    tray = null
+    win = null
+  })
   //win.loadFile('./code.pyret.org/build_experiment/web/views/editor.html')//./code.pyret.org/build/web/views/editor.html
 }
 
@@ -77,7 +129,9 @@ ipcMain.on('openFile', (event, path) => {
   }
 })
 
-app.on('ready', createWindow)
+app.on('before-quit', () => {
+  quitting = true
+})
 
 app.on('window-all-closed', () => {
   if (process.platform != 'darwin') {
@@ -89,4 +143,10 @@ app.on('activate', () => {
   if (win === null) {
     createWindow()
   }
+})
+
+app.on('ready', () => {
+  createMenu()
+  createTray()
+  createWindow()
 })
