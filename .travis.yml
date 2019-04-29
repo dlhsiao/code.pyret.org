@@ -35,6 +35,7 @@ cache:
   - node_modules
   - $HOME/Library/Caches/Homebrew
   - build
+  - compiled
 before_cache:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cleanup; fi
 before_script:
