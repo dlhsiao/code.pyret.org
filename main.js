@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, Tray } = require('electron')
+const { app, BrowserWindow} = require('electron')
 const url = require('url')
 const path = require('path')
 const {ipcMain} = require('electron')
@@ -30,51 +30,7 @@ require('electron-handlebars') ({
   GOOGLE_API_KEY: process.env.GOOGLE_API_KEY
 });
 
-let win = null
-let tray = null
 let quitting = false
-
-function createMenu() {
-  const appMenu = Menu.buildFromTemplate([
-    label: 'File',
-    submenu: [
-      {
-        label: 'Quit',
-        accelerator: 'CmdOrCtrl+Q',
-        click: () => {
-          app.quit()
-        }
-      }
-    ]
-  ])
-  Menu.setApplicationMenu(appMenu)
-}
-
-function createTray = () => {
-  const variant = (process.platform === 'darwin' ? 'Black' : 'White')
-  const iconPath = path.resolve(__dirname, './assets/icons/png/64x64.png')
-
-  tray = new Tray(iconPath)
-
-  const trayMenu = Menu.buildFromTemplate([
-    {
-      label: 'Preferences...',
-      click: () => {
-        win.show()
-      }
-    },
-    {
-      type: 'separator'
-    },
-    {
-      label: 'Quit',
-      click: () => {
-        app.quit()
-      }
-    }
-  ])
-  tray.setContextMenu(trayMenu)
-}
 
 function createWindow() {
   let win = new BrowserWindow({
@@ -146,7 +102,5 @@ app.on('activate', () => {
 })
 
 app.on('ready', () => {
-  createMenu()
-  createTray()
   createWindow()
 })
