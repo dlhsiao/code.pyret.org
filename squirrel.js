@@ -8,9 +8,9 @@ const pkg = require('./package.json')
 const appFolder = path.resolve(process.execPath, '..')
 const rootFolder = path.resolve(appFolder, '..')
 const updateDotExe = path.join(rootFolder, 'Update.exe')
-const exeName = path.basename(process.execPath)
+const exeName = path.resolve(path.join(rootFolder, 'app-0.0.0', '/Pyret.exe'))
 
-function spawn (command, args, callback) {
+function spawn(command, args, callback) {
   let spawnedProcess = null
   let error = null
   let stdout = ''
@@ -41,15 +41,15 @@ function spawn (command, args, callback) {
   })
 }
 
-function spawnUpdate (args, callback) {
+function spawnUpdate(args, callback) {
   spawn(updateDotExe, args, callback)
 }
 
-function createShortcuts (callback) {
+function createShortcuts(callback) {
   spawnUpdate(['--createShortcut', exeName], callback)
 }
 
-function updateShortcuts (callback) {
+function updateShortcuts(callback) {
   const homeDirectory = fs.getHomeDirectory()
   if (homeDirectory) {
     const desktopShortcutPath = path.join(homeDirectory, 'Desktop', `${pkg.productName}.lnk`)
@@ -67,7 +67,7 @@ function updateShortcuts (callback) {
   }
 }
 
-function removeShortcuts (callback) {
+function removeShortcuts(callback) {
   spawnUpdate(['--removeShortcut', exeName], callback)
 }
 
