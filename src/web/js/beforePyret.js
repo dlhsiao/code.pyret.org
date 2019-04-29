@@ -277,12 +277,14 @@ $(function() {
         response_type: 'code',
         //URI could be something locally, something on localhost. We'll have to decide
         //either a file localhost url or code.pyret.org url
-        redirect_uri: 'http://localhost:5000/oauth2callback',
+        redirect_uri: 'http://localhost:5000/oauth2callback', //'com.mydomain.pyret:/oauth2callback',
         client_id: '1025941403504-9jn95a8o6mm941psijqrev22ccma9n0i.apps.googleusercontent.com',
-        scope: 'email https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.install https://www.googleapis.com/auth/drive.photos.readonly https://www.googleapis.com/auth/photos',
+        scope: 'email https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.install https://www.googleapis.com/auth/drive.photos.readonly https://www.googleapis.com/auth/photos'
       }
+      // const authUrl = `${'https://localhost:5000/login'}?${qs.stringify(urlParams)}`
       const authUrl = `${'https://accounts.google.com/o/oauth2/v2/auth'}?${qs.stringify(urlParams)}`
-
+      // const authUrl = `${'https:pyret-horizon.herokuapp.com/login'}${qs.stringify(urlParams)}`
+      
       function handleNavigation (url) {
         const query = url2.parse(url, true).query
           if (query) {
@@ -332,25 +334,24 @@ $(function() {
       displayName: name,
       idToken: tokens.id_token,
     }
-    console.log("googleSignIn")
-    console.log(providerUser)
+    console.log("provider User: ", providerUser)
     // return mySignInFunction(providerUser)
   }
 
   async function fetchAccessTokens(code) {
     const response = await axios.post('https://www.googleapis.com/oauth2/v4/token', qs.stringify({
       code,
-      redirect_uri: 'http://localhost:5000/oauth2callback',
+      redirect_uri: 'http://localhost:5000/oauth2callback', //'com.mydomain.pyret:/oauth2callback', //'https://pyret-horizon.herokuapp.com/oauth2callback'
       client_id: '1025941403504-9jn95a8o6mm941psijqrev22ccma9n0i.apps.googleusercontent.com',
       grant_type: 'authorization_code',
+      // client_secret: 'yClbSHKu0Twvve9ADNHc7-xn'
+
     }), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-    })
-    console.log("in fetch")
-    console.log(response)
-    console.log(response.data)
+    }, {withCredentials : true})
+    console.log("Response: ", response.data)
     return response.data
   }
 
@@ -360,7 +361,8 @@ $(function() {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`,
       },
-    })
+
+    }, {withCredentials : true})
     return response.data
   }
 
