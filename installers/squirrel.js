@@ -1,3 +1,5 @@
+//https://github.com/electron-userland/electron-installer-windows/blob/master/example/src/main/squirrel.js
+
 'use strict'
 
 const fs = require('fs-plus')

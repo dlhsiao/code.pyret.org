@@ -1,3 +1,5 @@
+//https://github.com/electron-userland/electron-installer-windows/blob/master/example/src/main/args.js
+
 'use strict'
 
 const yargs = require('yargs')
