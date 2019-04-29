@@ -1,10 +1,10 @@
 const { app, BrowserWindow } = require('electron')
 const url = require('url')
 const path = require('path')
-const {ipcMain} = require('electron')
+const { ipcMain } = require('electron')
 
-const args = require('./args')
-const squirrel = require('./squirrel')
+const args = require('./installers/args')
+const squirrel = require('./installers/squirrel')
 
 const cmd = args.parseArguments(app, process.argv.slice(1)).squirrelCommand
 if (process.platform === 'win32' && squirrel.handleCommand(app, cmd)) {
@@ -22,7 +22,7 @@ if (process.platform === 'win32' && squirrel.handleCommand(app, cmd)) {
 
 var BUILD_DIR = "../"
 
-require('electron-handlebars') ({
+require('electron-handlebars')({
   MODE: BUILD_DIR,
   LOG_URL: process.env.LOG_URL,
   BASE_URL: process.env.BASE_URL,
@@ -30,7 +30,7 @@ require('electron-handlebars') ({
   GOOGLE_API_KEY: process.env.GOOGLE_API_KEY
 });
 
-let win
+let quitting = false
 
 function createWindow() {
   let win = new BrowserWindow({
@@ -45,21 +45,25 @@ function createWindow() {
     slashes: true
   }))
 
-  win.webContents.openDevTools()
+  //win.webContents.openDevTools()
 
-  win.on('close', function(e) {
+  win.on('close', function (e) {
+    if (quitting) {
+      return
+    }
+
     e.preventDefault();
-    win.destroy();
+    win.hide();
   })
 
   //win.loadFile('./code.pyret.org/build_experiment/web/views/editor.html')//./code.pyret.org/build/web/views/editor.html
 }
 
 ipcMain.on('openFile', (event, path) => {
-  const {dialog} = require('electron')
+  const { dialog } = require('electron')
   const fs = require('fs')
   dialog.showOpenDialog(function (fileNames) {
-    if(fileNames === undefined) {
+    if (fileNames === undefined) {
       console.log("No file selected");
     } else {
       readFile(fileNames[0]);
@@ -68,7 +72,7 @@ ipcMain.on('openFile', (event, path) => {
 
   function readFile(filepath) {
     fs.readFile(filepath, 'utf-8', (err, data) => {
-      if(err){
+      if (err) {
         alert("An error occurred reading the file:" + err.message)
         return
       }
@@ -77,7 +81,9 @@ ipcMain.on('openFile', (event, path) => {
   }
 })
 
-app.on('ready', createWindow)
+app.on('before-quit', () => {
+  quitting = true
+})
 
 app.on('window-all-closed', () => {
   if (process.platform != 'darwin') {
@@ -89,4 +95,8 @@ app.on('activate', () => {
   if (win === null) {
     createWindow()
   }
+})
+
+app.on('ready', () => {
+  createWindow()
 })

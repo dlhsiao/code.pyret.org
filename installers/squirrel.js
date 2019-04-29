@@ -3,12 +3,12 @@
 const fs = require('fs-plus')
 const path = require('path')
 const child = require('child_process')
-const pkg = require('./package.json')
+const pkg = require('../package.json')
 
 const appFolder = path.resolve(process.execPath, '..')
 const rootFolder = path.resolve(appFolder, '..')
 const updateDotExe = path.join(rootFolder, 'Update.exe')
-const exeName = path.resolve(path.join(rootFolder, 'app-0.0.0', '/Pyret.exe'))
+const exeName = path.resolve(path.join(rootFolder, 'app-' + pkg.version, '/Pyret.exe'))
 
 function spawn(command, args, callback) {
   let spawnedProcess = null

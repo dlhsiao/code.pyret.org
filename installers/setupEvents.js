@@ -15,7 +15,7 @@ module.exports = {
     const appFolder = path.resolve(process.execPath, '..');
     const rootAtomFolder = path.resolve(appFolder, '..');
     const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
-    const exeName = path.basename(process.execPath);
+    const exeName = path.resolve(path.dirname(process.execPath),'..',`app-` + appInfo.version,path.basename(process.execPath))//path.basename(process.execPath);
     const spawn = function(command, args) {
       let spawnedProcess, error;
 
