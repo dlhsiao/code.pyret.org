@@ -270,6 +270,7 @@ $(function() {
         width: 500,
         height: 600,
         show: true,
+        // webPreferences: { webSecurity: false }
       })
 
       // TODO: Generate and validate PKCE code_challenge value
@@ -278,15 +279,17 @@ $(function() {
         //URI could be something locally, something on localhost. We'll have to decide
         //either a file localhost url or code.pyret.org url
         redirect_uri: 'http://localhost:5000/oauth2callback', //'com.mydomain.pyret:/oauth2callback',
-        client_id: '1025941403504-9jn95a8o6mm941psijqrev22ccma9n0i.apps.googleusercontent.com',
+        client_id: '1025941403504-g0cl6nit6j6ft8fp2cmfuvid7jd92rmr.apps.googleusercontent.com',
         scope: 'email https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.install https://www.googleapis.com/auth/drive.photos.readonly https://www.googleapis.com/auth/photos'
       }
-      // const authUrl = `${'https://localhost:5000/login'}?${qs.stringify(urlParams)}`
-      const authUrl = `${'https://accounts.google.com/o/oauth2/v2/auth'}?${qs.stringify(urlParams)}`
+      const authUrl = 'http://localhost:5000/login?redirect=' + encodeURIComponent('/close.html')
+      // const authUrl = `${'https://accounts.google.com/o/oauth2/v2/auth'}?${qs.stringify(urlParams)}`
       // const authUrl = `${'https:pyret-horizon.herokuapp.com/login'}${qs.stringify(urlParams)}`
       
       function handleNavigation (url) {
         const query = url2.parse(url, true).query
+          console.log("query")
+          console.log(query)
           if (query) {
             if (query.error) {
               reject(new Error(`There was an error: ${query.error}`))
@@ -311,13 +314,17 @@ $(function() {
         throw new Error('Auth window was closed by user')
       })
 
-      authWindow.webContents.on('will-navigate', (event, url) => {
-        handleNavigation(url)
-      })
+      // authWindow.webContents.on('will-navigate', (event, url) => {
+      //   console.log("will navigate")
+      //   console.log(url)
+      //   handleNavigation(url)
+      // })
 
-      authWindow.webContents.on('did-get-redirect-request', (event, oldUrl, newUrl) => {
-        handleNavigation(newUrl)
-      })
+      // authWindow.webContents.on('did-get-redirect-request', (event, oldUrl, newUrl) => {
+      //   console.log('did get redirect request')
+      //   console.log(url)
+      //   handleNavigation(newUrl)
+      // })
 
       authWindow.loadURL(authUrl)
     })
@@ -335,10 +342,11 @@ $(function() {
       idToken: tokens.id_token,
     }
     console.log("provider User: ", providerUser)
-    // return mySignInFunction(providerUser)
+    console.log("googleSignIn")
+    console.log(providerUser)
   }
-
   async function fetchAccessTokens(code) {
+    console.log("in fetch")
     const response = await axios.post('https://www.googleapis.com/oauth2/v4/token', qs.stringify({
       code,
       redirect_uri: 'http://localhost:5000/oauth2callback', //'com.mydomain.pyret:/oauth2callback', //'https://pyret-horizon.herokuapp.com/oauth2callback'
@@ -349,19 +357,23 @@ $(function() {
     }), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRF-Token' : CSRF_TOKEN,
       },
-    }, {withCredentials : true})
-    console.log("Response: ", response.data)
+    })
+    console.log("in fetch")
+    console.log(response)
+    console.log(response.data)
     return response.data
   }
 
   async function fetchGoogleProfile (accessToken) {
+    console.log("in fetch google profile")
     const response = await axios.get('https://www.googleapis.com/userinfo/v2/me', {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`,
+        'X-CSRF-Token' : CSRF_TOKEN
       },
-
     }, {withCredentials : true})
     return response.data
   }
