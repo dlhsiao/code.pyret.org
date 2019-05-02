@@ -278,13 +278,15 @@ $(function() {
         response_type: 'code',
         //URI could be something locally, something on localhost. We'll have to decide
         //either a file localhost url or code.pyret.org url
-        redirect_uri: 'http://localhost:5000/oauth2callback', //'com.mydomain.pyret:/oauth2callback',
+        redirect_uri: 'http://localhost:5000/close.html', //'com.mydomain.pyret:/oauth2callback',
         client_id: '1025941403504-g0cl6nit6j6ft8fp2cmfuvid7jd92rmr.apps.googleusercontent.com',
+        client_secret: 'yClbSHKu0Twvve9ADNHc7-xn',
         scope: 'email https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.install https://www.googleapis.com/auth/drive.photos.readonly https://www.googleapis.com/auth/photos'
       }
-      const authUrl = 'http://localhost:5000/login?redirect=' + encodeURIComponent('/close.html')
+      // const authUrl = 'http://localhost:5000/login?redirect=' + encodeURIComponent('/close.html')
+      const authUrl = `${'http://localhost:5000/login'}?${qs.stringify(urlParams)}`
       // const authUrl = `${'https://accounts.google.com/o/oauth2/v2/auth'}?${qs.stringify(urlParams)}`
-      // const authUrl = `${'https:pyret-horizon.herokuapp.com/login'}${qs.stringify(urlParams)}`
+      // const authUrl = `${'http:pyret-horizon.herokuapp.com/login'}${qs.stringify(urlParams)}`
       
       function handleNavigation (url) {
         const query = url2.parse(url, true).query
@@ -299,9 +301,13 @@ $(function() {
               console.log(query.code)
               console.log(query)
               console.log(query.googleId)
-              authWindow.removeAllListeners('closed')
-              setImmediate(() => authWindow.close())
+              // When I comment this out it logs me in but in the other window, which makes me think
+              // That things are not being directed back to the original electron window 
+              // authWindow.removeAllListeners('closed')
+              // setImmediate(() => authWindow.close())
 
+              // Try closing original window
+              // window.close()
               // This is the authorization code we need to request tokens
               resolve(query.code)
             }
@@ -314,11 +320,11 @@ $(function() {
         throw new Error('Auth window was closed by user')
       })
 
-      // authWindow.webContents.on('will-navigate', (event, url) => {
-      //   console.log("will navigate")
-      //   console.log(url)
-      //   handleNavigation(url)
-      // })
+      authWindow.webContents.on('will-navigate', (event, url) => {
+        console.log("will navigate")
+        console.log(url)
+        handleNavigation(url)
+      })
 
       // authWindow.webContents.on('did-get-redirect-request', (event, oldUrl, newUrl) => {
       //   console.log('did get redirect request')
@@ -333,17 +339,35 @@ $(function() {
 
   async function googleSignIn() {
     const code = await signInWithPopup()
-    const tokens = await fetchAccessTokens(code)
-    const {id, email, name} = await fetchGoogleProfile(tokens.access_token)
-    const providerUser = {
-      uid: id,
-      email,
-      displayName: name,
-      idToken: tokens.id_token,
-    }
-    console.log("provider User: ", providerUser)
-    console.log("googleSignIn")
-    console.log(providerUser)
+    console.log("Returned Code: ", code)
+    // Get csrf-cookie 
+    await axios.get("http://localhost:5000/get-csrf-as-cookie").then(
+    function (data){
+      console.log(data["data"])
+      return data["data"]
+    });
+    .then(
+    function(creds){
+      console.log("Creds: ", creds)
+      axios.get("http://localhost:5000/getAccessToken", 
+      {headers : {"X-CSRF-Token" : creds['csrf_token'], "X-Requested-With": creds['XRequestedWith']}}, 
+      {withCredentials : true})
+    });
+    // Get access token
+    
+
+
+    // const tokens = await fetchAccessTokens(code)
+    // const {id, email, name} = await fetchGoogleProfile(tokens.access_token)
+    // const providerUser = {
+    //   uid: id,
+    //   email,
+    //   displayName: name,
+    //   idToken: tokens.id_token,
+    // }
+    // console.log("provider User: ", providerUser)
+    // console.log("googleSignIn")
+    // console.log(providerUser)
   }
   async function fetchAccessTokens(code) {
     console.log("in fetch")
@@ -387,31 +411,8 @@ $(function() {
 
     googleSignIn();
 
-    // var OAuth2Provider = window.require("electron-oauth-helper");
-    // var BrowserWindow = require('electron')
-    //
-    // var authWindow = new BrowserWindow({
-    //   width: 600,
-    //   height: 800,
-    //   webPreferences: {
-    //     nodeIntegration: false, // We recommend disabling nodeIntegration for security.
-    //     contextIsolation: true, // We recommend enabling contextIsolation for security.
-    //     // see https://github.com/electron/electron/blob/master/docs/tutorial/security.md
-    //   },
-    // })
 
-    var config = { /* oauth config. please see example/main/config.example.js.  */}
-    // var provider = new OAuth2Provider(config)
-    // Your can use custom parameter.
-    // const provider = new OAuth2Provider(config)
-    //   .withCustomAuthorizationRequestParameter({})
-    //   .withCustomAccessTokenRequestParameter({})
-    // provider.perform(authWindow)
-    //   .then(resp => {
-    //     console.log(resp)
-    //   })
-    //   .catch(error => console.error(error))
-    //$("#topTierUl").attr("tabIndex", "0");
+    // $("#topTierUl").attr("tabIndex", "0");
     // getTopTierMenuitems();
     // storageAPI = createProgramCollectionAPI("code.pyret.org", false);
     // storageAPI.then(function(api) {
