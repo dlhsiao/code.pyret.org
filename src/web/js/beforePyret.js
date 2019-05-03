@@ -266,6 +266,7 @@ $(function() {
   function signInWithPopup () {
     console.log("signInWithPopup")
     return new Promise((resolve, reject) => {
+      var d = Q.defer()
       const authWindow = new remote.BrowserWindow({
         width: 500,
         height: 600,
@@ -283,8 +284,8 @@ $(function() {
         client_secret: 'yClbSHKu0Twvve9ADNHc7-xn',
         scope: 'email https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.install https://www.googleapis.com/auth/drive.photos.readonly https://www.googleapis.com/auth/photos'
       }
-      // const authUrl = 'http://localhost:5000/login?redirect=' + encodeURIComponent('/close.html')
-      const authUrl = `${'http://localhost:5000/login'}?${qs.stringify(urlParams)}`
+      const authUrl = 'http://localhost:5000/login?redirect=' + encodeURIComponent('/close.html')
+      // const authUrl = `${'http://localhost:5000/login'}?${qs.stringify(urlParams)}`
       // const authUrl = `${'https://accounts.google.com/o/oauth2/v2/auth'}?${qs.stringify(urlParams)}`
       // const authUrl = `${'http:pyret-horizon.herokuapp.com/login'}${qs.stringify(urlParams)}`
       
@@ -303,13 +304,13 @@ $(function() {
               console.log(query.googleId)
               // When I comment this out it logs me in but in the other window, which makes me think
               // That things are not being directed back to the original electron window 
-              // authWindow.removeAllListeners('closed')
-              // setImmediate(() => authWindow.close())
+              //authWindow.removeAllListeners('closed')
+              //setImmediate(() => authWindow.close())
 
               // Try closing original window
               // window.close()
               // This is the authorization code we need to request tokens
-              resolve(query.code)
+              resolve({code: query.code, window: authWindow});
             }
           }
 
@@ -336,38 +337,29 @@ $(function() {
     })
   }
 
+  function delay(t, v) {
+   return new Promise(function(resolve) { 
+       setTimeout(resolve.bind(null, v), t)
+   });
+  }
 
   async function googleSignIn() {
-    const code = await signInWithPopup()
-    console.log("Returned Code: ", code)
+    var codeAndWindow = await signInWithPopup()
     // Get csrf-cookie 
     await axios.get("http://localhost:5000/get-csrf-as-cookie").then(
     function (data){
-      console.log(data["data"])
+      console.log("data: ", data["data"])
       return data["data"]
-    });
-    .then(
+    }).then(
     function(creds){
       console.log("Creds: ", creds)
       axios.get("http://localhost:5000/getAccessToken", 
       {headers : {"X-CSRF-Token" : creds['csrf_token'], "X-Requested-With": creds['XRequestedWith']}}, 
       {withCredentials : true})
+    }).then(function(){
+      codeAndWindow.window.removeAllListeners('closed')
+      setImmediate(() => codeAndWindow.window.close())      
     });
-    // Get access token
-    
-
-
-    // const tokens = await fetchAccessTokens(code)
-    // const {id, email, name} = await fetchGoogleProfile(tokens.access_token)
-    // const providerUser = {
-    //   uid: id,
-    //   email,
-    //   displayName: name,
-    //   idToken: tokens.id_token,
-    // }
-    // console.log("provider User: ", providerUser)
-    // console.log("googleSignIn")
-    // console.log(providerUser)
   }
   async function fetchAccessTokens(code) {
     console.log("in fetch")
@@ -412,8 +404,8 @@ $(function() {
     googleSignIn();
 
 
-    // $("#topTierUl").attr("tabIndex", "0");
-    // getTopTierMenuitems();
+    $("#topTierUl").attr("tabIndex", "0");
+    getTopTierMenuitems();
     // storageAPI = createProgramCollectionAPI("code.pyret.org", false);
     // storageAPI.then(function(api) {
     //   api.collection.then(function() {
