@@ -57,7 +57,7 @@ function createWindow() {
     }
 
     e.preventDefault();
-    win.hide();
+    win.destroy();
   })
 
   //win.loadFile('./code.pyret.org/build_experiment/web/views/editor.html')//./code.pyret.org/build/web/views/editor.html
