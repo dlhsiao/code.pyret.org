@@ -17,8 +17,7 @@ and test out the REPL, you only need to edit a few variables.  If you want to
 use the standalone pyret that comes with the checkout, you can just set
 
 ```
-PYRET="http://localhost:5000/js/cpo-main.jarr"
-MODE="/"
+PYRET_WEB="http://localhost:5000/js/cpo-main.jarr"
 ```
 
 Then you can run
@@ -26,7 +25,7 @@ Then you can run
 ```
 $ npm run local-install
 $ ln -s node_modules/pyret-lang pyret
-$ npm run build
+$ npm run build-web
 ```
 
 and the dependencies will be installed.
@@ -43,7 +42,7 @@ The editor will be served from `http://localhost:5000/editor`.
 If you edit JavaScript or HTML files in `src/web`, run
 
 ```
-$ npm run build
+$ npm run build-web
 ```
 
 and then refresh the page.
@@ -182,7 +181,6 @@ https://devcenter.heroku.com/articles/getting-started-with-nodejs
 8.  Tips for redeploy: if you don't see a successful build under heroku webiste's activity tab, but get "everything is up-to-date" when you run `git push heroku <localbranch>:master`, or your build doesn't look up-to-date, you can do an empty commit: `git commit --allow-empty -m "force deploy"`
 
 ### To run Electron Version
-1. Install electron `npm install --save-dev electron`
-2. In the .env file, change PYRET to "../js/cpo-main.jarr" and MODE to "../"
-3. Run `npm run build`
-2. Run `npm run start-app`
+1. In your `.env`, have `PYRET_APP="../js/cpo-main.jarr"`
+2. Run `npm run build-app`
+3. Run `npm run start-app`
