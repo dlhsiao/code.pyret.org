@@ -2,26 +2,15 @@ import React, { Component } from 'react';
 
 class File extends Component {
   render = () => {
-    if (MODE == "WEB"){
-      return (
-          <div className='file-wrapper'>
-            <div className="file" onClick={this.handleFileClick}>
-              <img src='/img/pyret-logo.png'/>
-              <p className='truncate'>{this.props.name}</p>
-            </div>
+    let modtime = new Date(this.props.modifiedTime).toDateString();
+    return (
+        <div className='file-wrapper'>
+          <div className="file" onClick={this.handleFileClick}>
+            <img src='/img/pyret-logo.png'/>
+            <span className='truncate'>{this.props.name}</span>
+            <span className='modified'>{modtime}</span>
           </div>
       );
-    }
-    else if (MODE == "APP"){
-      return (
-          <div className='file-wrapper'>
-            <div className="file" onClick={this.handleFileClick}>
-              <img src='../img/pyret-logo.png'/>
-              <p className='truncate'>{this.props.name}</p>
-            </div>
-          </div>
-      );
-    }
   }
 
   handleFileClick = () => {

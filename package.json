@@ -85,6 +85,7 @@
     "lint": "eslint src",
     "build-web": "heroku local:run make web-local",
     "build-app": "heroku local:run make app-local",
+    "heroku-postbuild": "echo Skip build on Heroku per https://help.heroku.com/P5IMU3MP/heroku-node-js-build-script-change-faq",
     "mocha": "heroku local:run mocha",
     "start-web": "heroku local:run supervisor --poll-interval 700 --watch src/run.js,src/server.js src/run.js & heroku local:run webpack-dev-server --port 5001 --watch",
     "start-app": "electron ./main.js",
