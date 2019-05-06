@@ -347,20 +347,14 @@ $(function() {
     var codeAndWindow = await signInWithPopup()
     // Get csrf-cookie 
     await axios.get("http://localhost:5000/get-csrf-as-cookie").then(
-    function (data){
-      console.log("data: ", data["data"])
-      return data["data"]
-    }).then(
-    function(creds){
-      console.log("Creds: ", creds)
+    function(){
       axios.get("http://localhost:5000/getAccessToken", 
-      {headers : {"X-CSRF-Token" : creds['csrf_token'], "X-Requested-With": creds['XRequestedWith']}}, 
       {withCredentials : true})
     }).then(function(){
       codeAndWindow.window.removeAllListeners('closed')
       setImmediate(() => codeAndWindow.window.close())      
     });
-  }
+  } 
   async function fetchAccessTokens(code) {
     console.log("in fetch")
     const response = await axios.post('https://www.googleapis.com/oauth2/v4/token', qs.stringify({
