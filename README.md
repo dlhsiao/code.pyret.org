@@ -221,6 +221,8 @@ To create the windows installer, run:
 $ npm run package-win
 $ npm run create-installer-windows
 ```
+Running this installer will launch the Pyret program and 
+automatically create a desktop shortcut for the application.
 
 #### Mac
 
