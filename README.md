@@ -94,15 +94,15 @@ platform-specific.  You will need
 your path.  Then run running:
 
 ```
-npm install selenium-webdriver mocha
-npm run mocha
+$ npm install selenium-webdriver mocha
+$ npm run mocha
 ```
 
 with Selenium and mocha installed and a development server running.  You can
 refine this with, e.g.
 
 ```
-npm run mocha -- -g "errors"
+$ npm run mocha -- -g "errors"
 ```
 
 to only run the tests in `test/errors.js`.  (The extra `--` are to escape the
@@ -180,7 +180,63 @@ https://devcenter.heroku.com/articles/getting-started-with-nodejs
 7.	Now run `heroku open` or visit appname.herokuapp.com.
 8.  Tips for redeploy: if you don't see a successful build under heroku webiste's activity tab, but get "everything is up-to-date" when you run `git push heroku <localbranch>:master`, or your build doesn't look up-to-date, you can do an empty commit: `git commit --allow-empty -m "force deploy"`
 
-### To run Electron Version
-1. In your `.env`, have `PYRET_APP="../js/cpo-main.jarr"`
-2. Run `npm run build-app`
-3. Run `npm run start-app`
+## Electron Version
+
+We created a native desktop application of the Pyret editor environment using Electron. 
+
+
+### To run the development Electron Version
+Follow the instructions in [Simple Configuration](#simple-configuration) and [Running with Development Pyret](#running-with-development-pyret). You'll want to make sure that in your `.env` you set
+
+```
+PYRET_APP="../js/cpo-main.jarr"
+```
+
+then you can run:
+
+```
+$ npm run build-app
+$ npm run start-app
+```
+
+### Create Installers for Electron Version
+
+To create installers for the Pyret application, we used [electron-packager](https://github.com/electron-userland/electron-packager), [electon-installer-windows](https://github.com/electron-userland/electron-installer-windows), [electron-installer-dmg](https://github.com/electron-userland/electron-installer-dmg), and [electron-installer-debian](https://github.com/electron-userland/electron-installer-debian).
+
+Make sure you have built the app version using 
+
+```
+$ npm run build-app
+```
+
+before trying to create an installer.
+
+Installers will be created in the `release_builds` folder.
+
+#### Windows
+
+To create the windows installer, run:
+
+```
+$ npm run package-win
+$ npm run create-installer-windows
+```
+
+
+#### Mac
+
+To create the Mac installer, run:
+
+```
+$ npm run package-mac
+$ npm run create-installer-mac
+```
+
+#### Linux
+
+To create the Linux installer, run:
+
+```
+$ npm run package-linux
+$ npm create-installer-debian
+```
