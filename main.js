@@ -19,7 +19,7 @@ if (process.platform === 'win32' && squirrel.handleCommand(app, cmd)) {
 //     return;
 // }
 
-let win
+let win = null
 
 var BUILD_DIR = "../"
 
@@ -30,8 +30,6 @@ require('electron-handlebars')({
   CSRF_TOKEN: "",
   GOOGLE_API_KEY: process.env.GOOGLE_API_KEY
 });
-
-let quitting = false
 
 function createWindow() {
   let win = new BrowserWindow({
@@ -52,12 +50,9 @@ function createWindow() {
   //win.webContents.openDevTools()
 
   win.on('close', function (e) {
-    if (quitting) {
-      return
-    }
-
     e.preventDefault();
     win.destroy();
+    win = null;
   })
 
   //win.loadFile('./code.pyret.org/build_experiment/web/views/editor.html')//./code.pyret.org/build/web/views/editor.html
@@ -85,8 +80,8 @@ ipcMain.on('openFile', (event, path) => {
   }
 })
 
-app.on('before-quit', () => {
-  quitting = true
+app.on('ready', () => {
+  createWindow()
 })
 
 app.on('window-all-closed', () => {
@@ -97,10 +92,6 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
   if (win === null) {
-    createWindow()
+    createWindow();
   }
-})
-
-app.on('ready', () => {
-  createWindow()
 })
