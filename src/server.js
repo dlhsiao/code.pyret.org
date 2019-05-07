@@ -54,7 +54,7 @@ function start(config, onServerReady) {
   })
 
   app.get("/__pyret-compiler", function(req, res) {
-    request.get(config.pyret).pipe(res);
+    request.get(config.pyret_web).pipe(res);
   });
 
   // This has to go first to override other options

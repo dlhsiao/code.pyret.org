@@ -502,7 +502,7 @@ body {
   height: 100%;
   max-height: 100%;
   padding-top: 40px;
-  padding-bottom: 5px;
+  padding-bottom: 2.5em;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   margin:0;
@@ -519,7 +519,7 @@ body {
   height: 100%;
   max-height: 100%;
   padding-top: 40px;
-  padding-bottom: 5px;
+  padding-bottom: 2.5em;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   margin:0;
@@ -573,6 +573,7 @@ body {
 #shareContainer div {
   height:100%
 }
+/*
 .notificationArea {
   z-index: 12000;
   width: 35%;
@@ -582,14 +583,38 @@ body {
   left: 55%;
   bottom: 45px;
 }
+*/
 
-.notificationArea div{
-  padding: 10px 24px;
-  background: rgba(32, 32, 32, 0.95);
-  border-radius:2px;
-  width: 100%;
-  vertical-align:bottom;
-  margin: 10px 0px;
+#welcome {
+  color: #eeeeee;
+  height: 2.5em;
+  line-height: 2.5em;
+  width: 50%;
+  float: left;
+}
+
+#welcome .username-message {
+  vertical-align: middle;
+  line-height: normal;
+  padding-left: 2em;
+  font-family: sans-serif;
+}
+
+
+.notificationArea {
+  background: #111111;
+  max-width: 50%;
+  float: right;
+  font-family: sans-serif;
+  height: 2.5em;
+  line-height: 2.5em;
+}
+
+.notificationArea span {
+  vertical-align: middle;
+  padding-right: 2em;
+  line-height: normal;
+  display: inline-block;
 }
 
 .notificationArea .active {
@@ -629,6 +654,7 @@ body {
 #filemenuContents {
   min-width: 200px;
 }
+#filemenuContents .hidden { display: none; }
 
 .menuContents {
   background-color: #EFEFEF;
@@ -1228,7 +1254,7 @@ code div {
   left: 0px;
   bottom: 0px;
   margin-top: 40px;
-  margin-bottom: 5px;
+  margin-bottom: 2.5em;
   height:auto;
 }
 
@@ -1968,7 +1994,7 @@ table.pyret-row {
    margin-right: -2.5em;
    width: 2.5em;
    height: 1.5em;
-   position: absolute;
+   position: relative;
    background-image: url(/img/checkers.svg);
    background-size: 2.5em 1.5em;
    display: inline-block;
@@ -1997,3 +2023,4 @@ button.controller {
     clip: rect(1px 1px 1px 1px);
     clip: rect(1px, 1px, 1px, 1px);
 }
+

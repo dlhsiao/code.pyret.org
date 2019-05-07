@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <!-- <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'"> -->
   <title>code.pyret.org</title>
   <!--BASE_URL = cwd
       web: http:localhost:5000
@@ -48,7 +49,7 @@
                     tabindex="-1"
                     class="blueButton focusable">
               <span>▾</span>
-              <img class="logo" src="/img/pyret-logo.png">
+              <img class="logo" src="{{{ MODE }}}/img/pyret-logo.png">
             </button>
             <span class="tooltiptext">
               Pyret menu
@@ -56,11 +57,6 @@
           </div>
           <ul id="bonniemenuContents" class="menuContents submenu" role="menu" aria-hidden="true"
             aria-label="Pyret Menu">
-            <li role="presentation">
-              <div id="welcome" class="menuButton inert" style="text-align: center;">
-                <span>Welcome, <span id="username" style="display: inline; padding: 0px;">guest</span>!</span>
-              </div>
-            </li>
             <li role="presentation">
               <div id="ctrl-question" class="menuButton">
                 <a class="focusable" role="menuitem"
@@ -164,10 +160,13 @@
                   tabindex="-1" href="javascript:void(0)" >New</a></div>
             </li>
             <li role="presentation">
-              <div id="open" class="menuButton">
-                <a  class="focusable" role="menuitem" aria-label="Open file"
+              <div id="programs" class="menuButton">
+                <a  class="focusable" role="menuitem" aria-label="My Programs"
                   aria-describedby="mhelp-submenu mhelp-activate mhelp-escape-submenu"
-                  tabindex="-1" href="javascript:void(0)">Open</a></div>
+                  tabindex="-1"
+                  target="_blank"
+                  href="/">My Programs</a>
+              </div>
             </li>
             <li role="presentation">
               <div id="open-original" class="menuButton disabled hidden">
@@ -289,7 +288,6 @@
     </div>
   </div>
 </div>
-<div id="notification" class="notificationArea"></div>
 <div id="REPL" class="replContainer" role="region" aria-label="Interactions">
 <div id="handle" class="ui-resizable-handle ui-resizable-w"></div>
 </div>
@@ -331,6 +329,10 @@
 </div>
 </div>
 <div id="footer">
+  <div id="welcome">
+    <span class="username-message">Programming as <span id="username" style="display: inline; padding: 0px;">a guest</span>.</span>
+  </div>
+  <div id="notification" class="notificationArea"></div>
   <div id="announcements" class="screenreader-only" role="region" aria-label="Announcements" tabindex="-1">
     <h2>Announcements</h2>
     <ul id="announcementlist" aria-live="assertive"
@@ -356,7 +358,7 @@
 <script src="{{{ MODE }}}js/matchkw.js"></script>
 <script src="{{{ MODE }}}js/mousetrap.min.js"></script>
 <script src="{{{ MODE }}}js/mousetrap-global-bind.min.js"></script>
-<script src="{{{ MODE }}}js/config.js"></script>
+<script src="{{{ MODE }}}js/config/config.js"></script>
 <script src="{{{ MODE }}}js/localSettings.js"></script>
 <script src="{{{ MODE }}}js/log.js"></script>
 <script src="{{{ MODE }}}js/share.js"></script>

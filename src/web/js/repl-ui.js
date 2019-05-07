@@ -612,12 +612,22 @@
       var stopLi = $('#stopli');
       container.append(output).append(promptContainer);
 
-      var img = $("<img>").attr({
-        "src": "/img/pyret-spin.gif",
-        "width": "25px",
-      }).css({
-        "vertical-align": "middle"
-      });
+      if (MODE == "WEB"){
+        var img = $("<img>").attr({
+          "src": "/img/pyret-spin.gif",
+          "width": "25px",
+        }).css({
+          "vertical-align": "middle"
+        });
+      }
+      else if (MODE == "APP") {
+        var img = $("<img>").attr({
+          "src": "../img/pyret-spin.gif",
+          "width": "25px",
+        }).css({
+          "vertical-align": "middle"
+        });
+      }
       var runContents;
       function updateItems(isMain) {
         //console.log('doing updateItems', isMain);
@@ -763,7 +773,12 @@
           // Note: renderedLocs is one element shorter than rendered
           var renderedLocs = locs.map(repl.runtime.makeSrcloc);
           var spyBlock = $("<div>").addClass("spy-block");
-          spyBlock.append($("<img>").addClass("spyglass").attr("src", "/img/spyglass.gif"));
+          if (MODE == "WEB"){
+            spyBlock.append($("<img>").addClass("spyglass").attr("src", "/img/spyglass.gif"));
+          }
+          else if (MODE == "APP") {
+            spyBlock.append($("<img>").addClass("spyglass").attr("src", "../img/spyglass.gif"));
+          }
           if (message !== "") {
             spyBlock.append($("<div>").addClass("spy-title").append(message));
           }
