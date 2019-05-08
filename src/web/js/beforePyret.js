@@ -24,6 +24,7 @@ window.highlightMode = "mcmh"; // what is this for?
 window.clearFlash = function() {
   $(".notificationArea").empty();
 }
+
 window.whiteToBlackNotification = function() {
   /*
   $(".notificationArea .active").css("background-color", "white");
@@ -253,8 +254,10 @@ $(function() {
       setUsername($("#username"));
     });
     api.collection.fail(function() {
-      $(".loginOnly").hide();
-      $(".logoutOnly").show();
+      if (MODE == "WEB") {
+        $(".loginOnly").hide();
+        $(".logoutOnly").show();
+      }
     });
   });
 
@@ -264,61 +267,36 @@ $(function() {
     $("#connectButton").attr("disabled", "disabled");
     $('#connectButtonli').attr('disabled', 'disabled');
     $("#connectButton").attr("tabIndex", "-1");
-
-    var OAuth2Provider = window.require("electron-oauth-helper");
-    var BrowserWindow = require('electron')
-
-    var authWindow = new BrowserWindow({
-      width: 600,
-      height: 800,
-      webPreferences: {
-        nodeIntegration: false, // We recommend disabling nodeIntegration for security.
-        contextIsolation: true, // We recommend enabling contextIsolation for security.
-        // see https://github.com/electron/electron/blob/master/docs/tutorial/security.md
-      },
-    })
-
-    var config = { /* oauth config. please see example/main/config.example.js.  */}
-    var provider = new OAuth2Provider(config)
-    // Your can use custom parameter.
-    // const provider = new OAuth2Provider(config)
-    //   .withCustomAuthorizationRequestParameter({})
-    //   .withCustomAccessTokenRequestParameter({})
-    provider.perform(authWindow)
-      .then(resp => {
-        console.log(resp)
-      })
-      .catch(error => console.error(error))
-    //$("#topTierUl").attr("tabIndex", "0");
-    // getTopTierMenuitems();
-    // storageAPI = createProgramCollectionAPI("code.pyret.org", false);
-    // storageAPI.then(function(api) {
-    //   api.collection.then(function() {
-    //     $(".loginOnly").show();
-    //     $(".logoutOnly").hide();
-    //     document.activeElement.blur();
-    //     $("#bonniemenubutton").focus();
-    //     setUsername($("#username"));
-    //     if(params["get"] && params["get"]["program"]) {
-    //       var toLoad = api.api.getFileById(params["get"]["program"]);
-    //       console.log("Logged in and has program to load: ", toLoad);
-    //       loadProgram(toLoad);
-    //       programToSave = toLoad;
-    //     } else {
-    //       programToSave = Q.fcall(function() { return null; });
-    //     }
-    //   });
-    //   api.collection.fail(function() {
-    //     $("#connectButton").text("Connect to Google Drive");
-    //     $("#connectButton").attr("disabled", false);
-    //     $('#connectButtonli').attr('disabled', false);
-    //     //$("#connectButton").attr("tabIndex", "0");
-    //     document.activeElement.blur();
-    //     $("#connectButton").focus();
-    //     //$("#topTierUl").attr("tabIndex", "-1");
-    //   });
-    // });
-    // storageAPI = storageAPI.then(function(api) { return api.api; });
+    // $("#topTierUl").attr("tabIndex", "0");
+    getTopTierMenuitems();
+    storageAPI = createProgramCollectionAPI("code.pyret.org", false);
+    storageAPI.then(function(api) {
+      api.collection.then(function() {
+        $(".loginOnly").show();
+        $(".logoutOnly").hide();
+        document.activeElement.blur();
+        $("#bonniemenubutton").focus();
+        setUsername($("#username"));
+        if(params["get"] && params["get"]["program"]) {
+          var toLoad = api.api.getFileById(params["get"]["program"]);
+          console.log("Logged in and has program to load: ", toLoad);
+          loadProgram(toLoad);
+          programToSave = toLoad;
+        } else {
+          programToSave = Q.fcall(function() { return null; });
+        }
+      });
+      api.collection.fail(function() {
+        $("#connectButton").text("Connect to Google Drive");
+        $("#connectButton").attr("disabled", false);
+        $('#connectButtonli').attr('disabled', false);
+        //$("#connectButton").attr("tabIndex", "0");
+        document.activeElement.blur();
+        $("#connectButton").focus();
+        //$("#topTierUl").attr("tabIndex", "-1");
+      });
+    });
+    storageAPI = storageAPI.then(function(api) { return api.api; });
   });
 
   /*
@@ -574,10 +552,16 @@ $(function() {
   }
 
   function newEvent(e) {
+    if (MODE == "APP"){
+      const path = require('path');
+      console.log(path.join(__dirname, 'editor.html'));
+			window.open('editor.html');
+    } else {
     window.open(window.APP_BASE_URL + "/editor");
   }
+  }
 
-  function saveEvent(e) {
+  function saveEvent(e, filename) {
     if(menuItemDisabled("save")) { return; }
     return save();
   }
@@ -608,6 +592,25 @@ $(function() {
       create = false;
     }
     window.stickMessage("Saving...");
+    if (MODE == "APP") {
+      var contents = CPO.editor.cm.getValue();
+		  var loc = window.location.pathname;
+
+	    storageAPI = localFileSaveAPI(loc);
+
+	    var api = storageAPI.api;
+      if (hasOpenedFile){
+	    	create = false;
+	    }
+			if (create){
+				api.createFile(contents).then(function(f){
+					programToSave = f;
+					hasOpenedFile = true;
+				});
+			} else {
+				api.autoSave(programToSave, contents);
+			}
+    } else {
     var savedProgram = programToSave.then(function(p) {
       if(p !== null && p.shared && !create) {
         return p; // Don't try to save shared files
@@ -648,8 +651,20 @@ $(function() {
     });
     return savedProgram;
   }
+}
 
   function saveAs() {
+    if (MODE == "APP") {
+      let loc = window.location.pathname;
+	  	var contents = CPO.editor.cm.getValue();
+	  	storageAPI = localFileSaveAPI(loc);
+	    var api = storageAPI.api;
+  		api.createFile(contents).then(function(f){
+  					programToSave = f;
+  					hasOpenedFile = true;
+  				});
+    } else {
+    
     if(menuItemDisabled("saveas")) { return; }
     programToSave.then(function(p) {
       var name = p === null ? "Untitled" : p.getName();
@@ -674,6 +689,25 @@ $(function() {
       });
     });
   }
+}
+
+var hasOpenedFile = false;
+
+function openEvent() {
+  let loc = window.location.pathname;
+
+  // SHOULD DO THIS ONCE GLOBALLY
+    storageAPI = localFileSaveAPI(loc);
+    var api = storageAPI.api;
+    api.getFileContents().then(function(arr){
+      programToSave = arr[0];
+      hasOpenedFile = true;
+      console.log(arr);
+      CPO.editor.cm.setValue(arr[1]);
+      console.log("inside open promise");
+      console.log("programToSave: " , programToSave);
+    });
+}
 
   function rename() {
     programToSave.then(function(p) {
@@ -721,6 +755,7 @@ $(function() {
   $("#save").click(saveEvent);
   $("#rename").click(rename);
   $("#saveas").click(saveAs);
+  $("#open").click(openEvent);
 
   var focusableElts = $(document).find('#header .focusable');
   //console.log('focusableElts=', focusableElts)
@@ -1171,6 +1206,13 @@ $(function() {
   if(MODE == "APP"){
     console.log(process.env.PYRET_APP);
     pyretLoad.src = process.env.PYRET_APP;
+    document.getElementById("programs").innerHTML = "Open";
+    document.getElementById("programs").setAttribute("id", "open");
+    $("#open").click(openEvent);
+    enableFileOptions();
+	  $(".loginOnly").show();
+	  $(".logoutOnly").hide();
+    
   }
   else if (MODE == "WEB"){
     console.log(process.env.PYRET_WEB);

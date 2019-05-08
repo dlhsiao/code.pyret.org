@@ -19,6 +19,7 @@ module.exports = {
   },
   node: {
       fs: 'empty',
+      __dirname: true,
   },
   module: {
     loaders: [
