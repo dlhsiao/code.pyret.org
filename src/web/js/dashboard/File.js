@@ -11,7 +11,7 @@ class File extends Component {
             <span className='modified'>{modtime}</span>
           </div>
         </div>
-      );
+    );
   }
 
   handleFileClick = () => {
