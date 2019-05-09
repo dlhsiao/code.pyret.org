@@ -46,7 +46,7 @@ function reauth(immediate) {
   var d = Q.defer();
   if (!immediate) {
     // Need to do a login to get a cookie for this user; do it in a popup
-    var w = window.open("https://code.pyret.org/login");
+    var w = window.open("/login?redirect=" + encodeURIComponent("/close.html"))    
     window.addEventListener('message', function(e) {
       // e.domain appears to not be defined in Firefox
       if ((e.domain || e.origin) === document.location.origin) {

@@ -10,6 +10,7 @@ class File extends Component {
             <span className='truncate'>{this.props.name}</span>
             <span className='modified'>{modtime}</span>
           </div>
+        </div>
       );
   }
 
