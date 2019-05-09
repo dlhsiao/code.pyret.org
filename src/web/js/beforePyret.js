@@ -1222,14 +1222,19 @@ function rename() {
   if(MODE == "APP"){
     console.log(process.env.PYRET_APP);
     pyretLoad.src = process.env.PYRET_APP;
-    document.getElementById("programs").innerHTML = "Open";
+    document.getElementById('programs').childNodes[1].text = "Open";
+    document.getElementById('programs').childNodes[1].href = 'javascript:void(0)';
     document.getElementById("programs").setAttribute("id", "open");
-    $("#programs").click(openEvent);
+    $("#open").click(openEvent);
     enableFileOptions();
 	  $(".loginOnly").show();
 	  $(".logoutOnly").hide();
     $("#drive-view").hide();
-    $("#welcome").hide();
+    // remove insert button
+    // save a copy should be save as?
+    // file name by the dropdown
+    // rename
+    // remove logout
 
 
   }
