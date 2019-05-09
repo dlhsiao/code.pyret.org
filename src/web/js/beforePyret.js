@@ -579,7 +579,45 @@ $(function() {
   */
   function save(newFilename) {
     var useName, create;
-    if(newFilename !== undefined) {
+    window.stickMessage("Saving...");
+    if (MODE == "APP") {
+      var contents = CPO.editor.cm.getValue();
+		  var loc = window.location.pathname;
+      console.log("In here");
+	    storageAPI = localFileSaveAPI(loc);
+
+	    var api = storageAPI.api;
+      if (hasOpenedFile){
+        console.log(hasOpenedFile)
+	    	create = false;
+	    }
+      else{
+        create = true;
+      }
+      //console.log("This is the value of create: ", create)
+			if (create){
+				api.createFile(contents).then(function(f){
+					programToSave = f;
+          //console.log("This is programToSave: ", programToSave)
+          if(programToSave === undefined){
+					   hasOpenedFile = false;
+             create = true;
+          } 
+          else{
+            hasOpenedFile = true;
+            create = false;
+            window.flashMessage("Program saved as " + f.substr(f.lastIndexOf("/") + 1));
+
+          }
+
+				});
+			} else {
+				api.autoSave(programToSave, contents);
+        window.flashMessage("Program saved as " + programToSave.substr(programToSave.lastIndexOf("/") + 1));
+
+			}
+    } else {
+  if(newFilename !== undefined) {
       useName = newFilename;
       create = true;
     }
@@ -591,26 +629,6 @@ $(function() {
       useName = filename; // A closed-over variable
       create = false;
     }
-    window.stickMessage("Saving...");
-    if (MODE == "APP") {
-      var contents = CPO.editor.cm.getValue();
-		  var loc = window.location.pathname;
-
-	    storageAPI = localFileSaveAPI(loc);
-
-	    var api = storageAPI.api;
-      if (hasOpenedFile){
-	    	create = false;
-	    }
-			if (create){
-				api.createFile(contents).then(function(f){
-					programToSave = f;
-					hasOpenedFile = true;
-				});
-			} else {
-				api.autoSave(programToSave, contents);
-			}
-    } else {
     var savedProgram = programToSave.then(function(p) {
       if(p !== null && p.shared && !create) {
         return p; // Don't try to save shared files
@@ -662,7 +680,12 @@ $(function() {
   		api.createFile(contents).then(function(f){
   					programToSave = f;
   					hasOpenedFile = true;
-  				});
+            return programToSave;
+  				}).then(function(p){
+            console.log("PTS: ", p);
+            window.flashMessage("Program saved as " + p.substr(p.lastIndexOf("/") + 1)); 
+          });
+
     } else {
 
     if(menuItemDisabled("saveas")) { return; }
