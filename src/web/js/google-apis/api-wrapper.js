@@ -46,11 +46,13 @@ function reauth(immediate) {
   var d = Q.defer();
   if (!immediate) {
     // Need to do a login to get a cookie for this user; do it in a popup
-    var w = window.open("/login?redirect=" + encodeURIComponent("/close.html"));
+    var w = window.open("/login?redirect=" + encodeURIComponent("/close.html"))    
     window.addEventListener('message', function(e) {
       // e.domain appears to not be defined in Firefox
       if ((e.domain || e.origin) === document.location.origin) {
         d.resolve(reauth(true));
+        console.log(e)
+        console.log(d)
       } else {
         d.resolve(null);
       }
@@ -58,7 +60,10 @@ function reauth(immediate) {
   } else {
     // The user is logged in, but needs an access token from our server
     var newToken = $.ajax("/getAccessToken", { method: "get", datatype: "json" });
+    console.log("in here")
+    
     newToken.then(function(t) {
+      console.log(t)
       gapi.auth.setToken({ access_token: t.access_token });
       logger.log('login', {user_id: t.user_id});
       d.resolve({ user_id: t.user_id, access_token: t.access_token });

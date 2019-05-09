@@ -24,6 +24,7 @@ window.highlightMode = "mcmh"; // what is this for?
 window.clearFlash = function() {
   $(".notificationArea").empty();
 }
+
 window.whiteToBlackNotification = function() {
   /*
   $(".notificationArea .active").css("background-color", "white");
@@ -253,8 +254,10 @@ $(function() {
       setUsername($("#username"));
     });
     api.collection.fail(function() {
-      $(".loginOnly").hide();
-      $(".logoutOnly").show();
+      if (MODE == "WEB") {
+        $(".loginOnly").hide();
+        $(".logoutOnly").show();
+      }
     });
   });
 
@@ -264,7 +267,7 @@ $(function() {
     $("#connectButton").attr("disabled", "disabled");
     $('#connectButtonli').attr('disabled', 'disabled');
     $("#connectButton").attr("tabIndex", "-1");
-    //$("#topTierUl").attr("tabIndex", "0");
+    // $("#topTierUl").attr("tabIndex", "0");
     getTopTierMenuitems();
     storageAPI = createProgramCollectionAPI("code.pyret.org", false);
     storageAPI.then(function(api) {
@@ -373,11 +376,18 @@ $(function() {
   }
 
   function updateName(p) {
-    filename = p.getName();
-    $("#filename").text(" (" + truncateName(filename) + ")");
-    setTitle(filename);
-    showShareContainer(p);
+    if (MODE == "APP"){
+      $("#filename").text(" (" + (p) + ")");
+      setTitle(p);
+    }
+    else{
+      filename = p.getName();
+      $("#filename").text(" (" + truncateName(filename) + ")");
+      setTitle(filename);
+      showShareContainer(p);
+    }
   }
+
 
   function loadProgram(p) {
     programToSave = p;
@@ -415,7 +425,6 @@ $(function() {
     nextIndex = ((nextIndex % maxIndex) + maxIndex) % maxIndex;
     return nextIndex;
   }
-
   function populateFocusCarousel(editor) {
     if (!editor.focusCarousel) {
       editor.focusCarousel = [];
@@ -550,10 +559,16 @@ $(function() {
   }
 
   function newEvent(e) {
+    if (MODE == "APP"){
+      const path = require('path');
+      console.log(path.join(__dirname, 'editor.html'));
+			window.open('editor.html');
+    } else {
     window.open(window.APP_BASE_URL + "/editor");
   }
+  }
 
-  function saveEvent(e) {
+  function saveEvent(e, filename) {
     if(menuItemDisabled("save")) { return; }
     return save();
   }
@@ -569,9 +584,49 @@ $(function() {
     set the name to "Untitled".
 
   */
+  var filePath;
   function save(newFilename) {
     var useName, create;
-    if(newFilename !== undefined) {
+    window.stickMessage("Saving...");
+    if (MODE == "APP") {
+      var contents = CPO.editor.cm.getValue();
+		  var loc = window.location.pathname;
+      console.log("In here");
+	    storageAPI = localFileSaveAPI(loc);
+
+	    var api = storageAPI.api;
+      if (hasOpenedFile){
+        console.log(hasOpenedFile)
+	    	create = false;
+	    }
+      else{
+        create = true;
+      }
+      //console.log("This is the value of create: ", create)
+			if (create){
+				api.createFile(contents).then(function(f){
+					filePath = f;
+          //console.log("This is programToSave: ", programToSave)
+          if(filePath === undefined){
+					   hasOpenedFile = false;
+             create = true;
+          } 
+          else{
+            hasOpenedFile = true;
+            create = false;
+            window.flashMessage("Program saved as " + f.substr(f.lastIndexOf("/") + 1));
+            updateName(f.substr(f.lastIndexOf("/") + 1)); //This is just a test
+
+          }
+
+				});
+			} else {
+				api.autoSave(filePath, contents);
+        window.flashMessage("Program saved as " + filePath.substr(filePath.lastIndexOf("/") + 1));
+
+			}
+    } else {
+  if(newFilename !== undefined) {
       useName = newFilename;
       create = true;
     }
@@ -583,7 +638,6 @@ $(function() {
       useName = filename; // A closed-over variable
       create = false;
     }
-    window.stickMessage("Saving...");
     var savedProgram = programToSave.then(function(p) {
       if(p !== null && p.shared && !create) {
         return p; // Don't try to save shared files
@@ -624,8 +678,26 @@ $(function() {
     });
     return savedProgram;
   }
+}
 
   function saveAs() {
+    if (MODE == "APP") {
+      let loc = window.location.pathname;
+	  	var contents = CPO.editor.cm.getValue();
+	  	storageAPI = localFileSaveAPI(loc);
+	    var api = storageAPI.api;
+  		api.createFile(contents).then(function(f){
+  					filePath = f;
+  					hasOpenedFile = true;
+            return filePath;
+  				}).then(function(p){
+            console.log("PTS: ", p);
+            window.flashMessage("Program saved as " + p.substr(p.lastIndexOf("/") + 1)); 
+            updateName(p.substr(p.lastIndexOf("/") + 1))
+          });
+
+    } else {
+
     if(menuItemDisabled("saveas")) { return; }
     programToSave.then(function(p) {
       var name = p === null ? "Untitled" : p.getName();
@@ -650,44 +722,89 @@ $(function() {
       });
     });
   }
+}
 
-  function rename() {
-    programToSave.then(function(p) {
-      var renamePrompt = new modalPrompt({
-        title: "Rename this file",
-        style: "text",
-        options: [
-          {
-            message: "The new name for the file:",
-            defaultValue: p.getName()
-          }
-        ]
-      });
-      // null return values are for the "cancel" path
-      return renamePrompt.show().then(function(newName) {
-        if(newName === null) {
-          return null;
-        }
-        window.stickMessage("Renaming...");
-        programToSave = p.rename(newName);
-        return programToSave;
-      })
-      .then(function(p) {
-        if(p === null) {
-          return null;
-        }
-        updateName(p);
-        window.flashMessage("Program saved as " + p.getName());
-      })
-      .fail(function(err) {
-        console.error("Failed to rename: ", err);
-        window.flashError("Failed to rename file");
-      });
-    })
-    .fail(function(err) {
-      console.error("Unable to rename: ", err);
+var hasOpenedFile = false;
+
+function openEvent() {
+  let loc = window.location.pathname;
+
+  // SHOULD DO THIS ONCE GLOBALLY
+    storageAPI = localFileSaveAPI(loc);
+    var api = storageAPI.api;
+    api.getFileContents().then(function(arr){
+      // programToSave = arr[0];
+      filePath = arr[0];
+      hasOpenedFile = true;
+      console.log(arr);
+      CPO.editor.cm.setValue(arr[1]);
+      console.log("inside open promise");
+      console.log("programToSave: " , filePath);
+      updateName(filePath.substr(filePath.lastIndexOf("/") + 1))
     });
-  }
+}
+
+function rename() {
+  let loc = window.location.pathname;
+
+  // SHOULD DO THIS ONCE GLOBALLY
+    storageAPI = localFileSaveAPI(loc);
+    var api = storageAPI.api;
+  programToSave.then(function (p) {
+    var defaultName;
+    if (MODE == "APP"){
+      defaultName = filePath.substr(filePath.lastIndexOf("/")+1);
+    }
+    else {
+      defaultName = p.getName();
+    }
+    var renamePrompt = new modalPrompt({
+      title: "Rename this file",
+      style: "text",
+      options: [{
+        message: "The new name for the file:",
+        defaultValue: defaultName
+      }]
+    });
+    // null return values are for the "cancel" path
+    return renamePrompt.show().then(function (newName) {
+      if (newName === null) {
+        return null;
+      }
+      window.stickMessage("Renaming...");
+      console.log(newName);
+      if (MODE == "APP"){
+        var newFilePath = filePath.substr(0, filePath.lastIndexOf("/")+1) + newName;
+        console.log(newFilePath);
+        api.rename(filePath, newFilePath);
+        filePath = newFilePath;
+        return newName
+      }
+      else {
+        programToSave = p.rename(newName);
+      }
+      return programToSave;
+    }).then(function (p) {
+      if (p === null) {
+        return null;
+      }
+      if (MODE == "WEB"){
+      window.flashMessage("Program saved as " + p.getName());
+      }
+      else{
+        window.flashMessage("Program saved as " + p);
+      }
+      updateName(p);
+
+      // This is where you want to stick the message
+    }).fail(function (err) {
+      console.error("Failed to rename: ", err);
+      window.flashError("Failed to rename file");
+    });
+  }).fail(function (err) {
+    console.error("Unable to rename: ", err);
+  });
+}
 
   $("#runButton").click(function() {
     CPO.autoSave();
@@ -1147,6 +1264,25 @@ $(function() {
   if(MODE == "APP"){
     console.log(process.env.PYRET_APP);
     pyretLoad.src = process.env.PYRET_APP;
+    document.getElementById('saveas').childNodes[1].text = "Save As";
+    document.getElementById('programs').childNodes[1].text = "Open";
+    document.getElementById('programs').childNodes[1].href = 'javascript:void(0)';
+    document.getElementById("programs").setAttribute("id", "open");
+    $("#open").click(openEvent);
+    enableFileOptions();
+	  $(".loginOnly").show();
+	  $(".logoutOnly").hide();
+    $("#drive-view").hide();
+    $("#insertPart").hide();
+    
+
+    // remove insert button
+    // save a copy should be save as?
+    // file name by the dropdown
+    // rename
+    // remove logout
+
+
   }
   else if (MODE == "WEB"){
     console.log(process.env.PYRET_WEB);
