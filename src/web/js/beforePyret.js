@@ -577,6 +577,7 @@ $(function() {
     set the name to "Untitled".
 
   */
+  var filePath;
   function save(newFilename) {
     var useName, create;
     window.stickMessage("Saving...");
@@ -597,9 +598,9 @@ $(function() {
       //console.log("This is the value of create: ", create)
 			if (create){
 				api.createFile(contents).then(function(f){
-					programToSave = f;
+					filePath = f;
           //console.log("This is programToSave: ", programToSave)
-          if(programToSave === undefined){
+          if(filePath === undefined){
 					   hasOpenedFile = false;
              create = true;
           } 
@@ -612,8 +613,8 @@ $(function() {
 
 				});
 			} else {
-				api.autoSave(programToSave, contents);
-        window.flashMessage("Program saved as " + programToSave.substr(programToSave.lastIndexOf("/") + 1));
+				api.autoSave(filePath, contents);
+        window.flashMessage("Program saved as " + filePath.substr(filePath.lastIndexOf("/") + 1));
 
 			}
     } else {
@@ -678,9 +679,9 @@ $(function() {
 	  	storageAPI = localFileSaveAPI(loc);
 	    var api = storageAPI.api;
   		api.createFile(contents).then(function(f){
-  					programToSave = f;
+  					filePath = f;
   					hasOpenedFile = true;
-            return programToSave;
+            return filePath;
   				}).then(function(p){
             console.log("PTS: ", p);
             window.flashMessage("Program saved as " + p.substr(p.lastIndexOf("/") + 1)); 
@@ -723,13 +724,13 @@ function openEvent() {
     storageAPI = localFileSaveAPI(loc);
     var api = storageAPI.api;
     api.getFileContents().then(function(arr){
-      programToSave = arr[0];
-      // filePath = arr[0];
+      // programToSave = arr[0];
+      filePath = arr[0];
       hasOpenedFile = true;
       console.log(arr);
       CPO.editor.cm.setValue(arr[1]);
       console.log("inside open promise");
-      console.log("programToSave: " , programToSave);
+      console.log("programToSave: " , filePath);
     });
 }
 
@@ -742,7 +743,7 @@ function rename() {
   programToSave.then(function (p) {
     var defaultName;
     if (MODE == "APP"){
-      defaultName = p.substr(p.lastIndexOf("/")+1);
+      defaultName = filePath.substr(filePath.lastIndexOf("/")+1);
     }
     else {
       defaultName = p.getName();
@@ -763,10 +764,10 @@ function rename() {
       window.stickMessage("Renaming...");
       console.log(newName);
       if (MODE == "APP"){
-        var newFilePath = p.substr(0, p.lastIndexOf("/")+1) + newName;
+        var newFilePath = filePath.substr(0, filePath.lastIndexOf("/")+1) + newName;
         console.log(newFilePath);
-        api.rename(p, newFilePath);
-        programToSave = newFilePath;
+        api.rename(filePath, newFilePath);
+        filePath = newFilePath;
       }
       else {
         programToSave = p.rename(newName);
