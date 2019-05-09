@@ -376,11 +376,18 @@ $(function() {
   }
 
   function updateName(p) {
-    filename = p.getName();
-    $("#filename").text(" (" + truncateName(filename) + ")");
-    setTitle(filename);
-    showShareContainer(p);
+    if (MODE == "APP"){
+      $("#filename").text(" (" + (p) + ")");
+      setTitle(p);
+    }
+    else{
+      filename = p.getName();
+      $("#filename").text(" (" + truncateName(filename) + ")");
+      setTitle(filename);
+      showShareContainer(p);
+    }
   }
+
 
   function loadProgram(p) {
     programToSave = p;
@@ -608,6 +615,7 @@ $(function() {
             hasOpenedFile = true;
             create = false;
             window.flashMessage("Program saved as " + f.substr(f.lastIndexOf("/") + 1));
+            updateName(f.substr(f.lastIndexOf("/") + 1)); //This is just a test
 
           }
 
@@ -685,6 +693,7 @@ $(function() {
   				}).then(function(p){
             console.log("PTS: ", p);
             window.flashMessage("Program saved as " + p.substr(p.lastIndexOf("/") + 1)); 
+            updateName(p.substr(p.lastIndexOf("/") + 1))
           });
 
     } else {
@@ -731,6 +740,7 @@ function openEvent() {
       CPO.editor.cm.setValue(arr[1]);
       console.log("inside open promise");
       console.log("programToSave: " , filePath);
+      updateName(filePath.substr(filePath.lastIndexOf("/") + 1))
     });
 }
 
@@ -768,6 +778,7 @@ function rename() {
         console.log(newFilePath);
         api.rename(filePath, newFilePath);
         filePath = newFilePath;
+        return newName
       }
       else {
         programToSave = p.rename(newName);
@@ -777,8 +788,15 @@ function rename() {
       if (p === null) {
         return null;
       }
-      updateName(p);
+      if (MODE == "WEB"){
       window.flashMessage("Program saved as " + p.getName());
+      }
+      else{
+        window.flashMessage("Program saved as " + p);
+      }
+      updateName(p);
+
+      // This is where you want to stick the message
     }).fail(function (err) {
       console.error("Failed to rename: ", err);
       window.flashError("Failed to rename file");
