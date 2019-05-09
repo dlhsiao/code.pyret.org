@@ -1230,6 +1230,8 @@ function rename() {
 	  $(".loginOnly").show();
 	  $(".logoutOnly").hide();
     $("#drive-view").hide();
+    $("#insertPart").hide();
+
     // remove insert button
     // save a copy should be save as?
     // file name by the dropdown
