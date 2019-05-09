@@ -149,12 +149,12 @@ window.localFileSaveAPI = function createProgramCollectionAPI(baseCollection) {
           }
 
           // fileName is a string that contains the path and filename created in the save file dialog.
-          fs.writeFile(fileName + ".arr", contents, (err) => {
+          fs.writeFile(fileName, contents, (err) => {
               if(err){
                   alert("An error ocurred creating the file "+ err.message)
               }
-              console.log(fileName + ".arr");
-              name.resolve(fileName+ ".arr");
+              console.log(fileName);
+              name.resolve(fileName);
               // return(fileName);
               // alert("The file has been succesfully saved");
           });

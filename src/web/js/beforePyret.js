@@ -1264,6 +1264,7 @@ function rename() {
   if(MODE == "APP"){
     console.log(process.env.PYRET_APP);
     pyretLoad.src = process.env.PYRET_APP;
+    document.getElementById('saveas').childNodes[1].text = "Save As";
     document.getElementById('programs').childNodes[1].text = "Open";
     document.getElementById('programs').childNodes[1].href = 'javascript:void(0)';
     document.getElementById("programs").setAttribute("id", "open");
@@ -1273,6 +1274,7 @@ function rename() {
 	  $(".logoutOnly").hide();
     $("#drive-view").hide();
     $("#insertPart").hide();
+    
 
     // remove insert button
     // save a copy should be save as?
