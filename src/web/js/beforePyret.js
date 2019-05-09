@@ -664,7 +664,7 @@ $(function() {
   					hasOpenedFile = true;
   				});
     } else {
-    
+
     if(menuItemDisabled("saveas")) { return; }
     programToSave.then(function(p) {
       var name = p === null ? "Untitled" : p.getName();
@@ -700,7 +700,8 @@ function openEvent() {
     storageAPI = localFileSaveAPI(loc);
     var api = storageAPI.api;
     api.getFileContents().then(function(arr){
-      programToSave = arr[0];
+      //programToSave = arr[0];
+      filePath = arr[0];
       hasOpenedFile = true;
       console.log(arr);
       CPO.editor.cm.setValue(arr[1]);
@@ -709,43 +710,59 @@ function openEvent() {
     });
 }
 
-  function rename() {
-    programToSave.then(function(p) {
-      var renamePrompt = new modalPrompt({
-        title: "Rename this file",
-        style: "text",
-        options: [
-          {
-            message: "The new name for the file:",
-            defaultValue: p.getName()
-          }
-        ]
-      });
-      // null return values are for the "cancel" path
-      return renamePrompt.show().then(function(newName) {
-        if(newName === null) {
-          return null;
-        }
-        window.stickMessage("Renaming...");
-        programToSave = p.rename(newName);
-        return programToSave;
-      })
-      .then(function(p) {
-        if(p === null) {
-          return null;
-        }
-        updateName(p);
-        window.flashMessage("Program saved as " + p.getName());
-      })
-      .fail(function(err) {
-        console.error("Failed to rename: ", err);
-        window.flashError("Failed to rename file");
-      });
-    })
-    .fail(function(err) {
-      console.error("Unable to rename: ", err);
+function rename() {
+  let loc = window.location.pathname;
+
+  // SHOULD DO THIS ONCE GLOBALLY
+    storageAPI = localFileSaveAPI(loc);
+    var api = storageAPI.api;
+  programToSave.then(function (p) {
+    var defaultName;
+    if (MODE == "APP"){
+      defaultName = filePath.substr(filePath.lastIndexOf("/")+1);
+    }
+    else {
+      defaultName = p.getName();
+    }
+    var renamePrompt = new modalPrompt({
+      title: "Rename this file",
+      style: "text",
+      options: [{
+        message: "The new name for the file:",
+        defaultValue: defaultName
+      }]
     });
-  }
+    // null return values are for the "cancel" path
+    return renamePrompt.show().then(function (newName) {
+      if (newName === null) {
+        return null;
+      }
+      window.stickMessage("Renaming...");
+      console.log(newName);
+      if (MODE == "APP"){
+        var newFilePath = filePath.substr(0, filePath.lastIndexOf("/")+1) + newName;
+        console.log(newFilePath);
+        api.rename(filePath, newFilePath);
+        filePath = newFilePath;
+      }
+      else {
+        programToSave = p.rename(newName);
+      }
+      return programToSave;
+    }).then(function (p) {
+      if (p === null) {
+        return null;
+      }
+      updateName(p);
+      window.flashMessage("Program saved as " + p.getName());
+    }).fail(function (err) {
+      console.error("Failed to rename: ", err);
+      window.flashError("Failed to rename file");
+    });
+  }).fail(function (err) {
+    console.error("Unable to rename: ", err);
+  });
+}
 
   $("#runButton").click(function() {
     CPO.autoSave();
@@ -755,7 +772,6 @@ function openEvent() {
   $("#save").click(saveEvent);
   $("#rename").click(rename);
   $("#saveas").click(saveAs);
-  $("#open").click(openEvent);
 
   var focusableElts = $(document).find('#header .focusable');
   //console.log('focusableElts=', focusableElts)
@@ -1208,11 +1224,14 @@ function openEvent() {
     pyretLoad.src = process.env.PYRET_APP;
     document.getElementById("programs").innerHTML = "Open";
     document.getElementById("programs").setAttribute("id", "open");
-    $("#open").click(openEvent);
+    $("#programs").click(openEvent);
     enableFileOptions();
 	  $(".loginOnly").show();
 	  $(".logoutOnly").hide();
-    
+    $("#drive-view").hide();
+    $("#welcome").hide();
+
+
   }
   else if (MODE == "WEB"){
     console.log(process.env.PYRET_WEB);
