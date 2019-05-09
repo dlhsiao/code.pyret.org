@@ -723,8 +723,8 @@ function openEvent() {
     storageAPI = localFileSaveAPI(loc);
     var api = storageAPI.api;
     api.getFileContents().then(function(arr){
-      //programToSave = arr[0];
-      filePath = arr[0];
+      programToSave = arr[0];
+      // filePath = arr[0];
       hasOpenedFile = true;
       console.log(arr);
       CPO.editor.cm.setValue(arr[1]);
@@ -742,7 +742,7 @@ function rename() {
   programToSave.then(function (p) {
     var defaultName;
     if (MODE == "APP"){
-      defaultName = filePath.substr(filePath.lastIndexOf("/")+1);
+      defaultName = p.substr(p.lastIndexOf("/")+1);
     }
     else {
       defaultName = p.getName();
@@ -763,10 +763,10 @@ function rename() {
       window.stickMessage("Renaming...");
       console.log(newName);
       if (MODE == "APP"){
-        var newFilePath = filePath.substr(0, filePath.lastIndexOf("/")+1) + newName;
+        var newFilePath = p.substr(0, p.lastIndexOf("/")+1) + newName;
         console.log(newFilePath);
-        api.rename(filePath, newFilePath);
-        filePath = newFilePath;
+        api.rename(p, newFilePath);
+        programToSave = newFilePath;
       }
       else {
         programToSave = p.rename(newName);
@@ -1245,14 +1245,21 @@ function rename() {
   if(MODE == "APP"){
     console.log(process.env.PYRET_APP);
     pyretLoad.src = process.env.PYRET_APP;
-    document.getElementById("programs").innerHTML = "Open";
+    document.getElementById('programs').childNodes[1].text = "Open";
+    document.getElementById('programs').childNodes[1].href = 'javascript:void(0)';
     document.getElementById("programs").setAttribute("id", "open");
-    $("#programs").click(openEvent);
+    $("#open").click(openEvent);
     enableFileOptions();
 	  $(".loginOnly").show();
 	  $(".logoutOnly").hide();
     $("#drive-view").hide();
-    $("#welcome").hide();
+    $("#insertPart").hide();
+
+    // remove insert button
+    // save a copy should be save as?
+    // file name by the dropdown
+    // rename
+    // remove logout
 
 
   }
